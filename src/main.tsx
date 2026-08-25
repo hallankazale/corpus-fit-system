@@ -7,6 +7,7 @@ import { AccountProvider } from "./state/AccountContext";
 import "./styles.css";
 import "./phase2.css";
 import "./account.css";
+import "./turnstile.css";
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
