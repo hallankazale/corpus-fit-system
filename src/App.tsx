@@ -1,4 +1,6 @@
+import type { ReactNode } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
+import { isDemoAuthenticated } from "./services/demoAuth";
 import { AboutScreen } from "./screens/AboutScreen";
 import { ActiveWorkoutScreen } from "./screens/ActiveWorkoutScreen";
 import { ClassesScreen } from "./screens/ClassesScreen";
@@ -13,4 +15,32 @@ import { SettingsScreen } from "./screens/SettingsScreen";
 import { StudentsScreen } from "./screens/StudentsScreen";
 import { WorkoutsScreen } from "./screens/WorkoutsScreen";
 
-export function App(){return <Routes><Route path="/login" element={<LoginScreen/>}/><Route path="/cadastro" element={<RegisterScreen/>}/><Route path="/" element={<HomeScreen/>}/><Route path="/treinos" element={<WorkoutsScreen/>}/><Route path="/treinos/ativo" element={<ActiveWorkoutScreen/>}/><Route path="/evolucao" element={<EvolutionScreen/>}/><Route path="/aulas" element={<ClassesScreen/>}/><Route path="/pagamentos" element={<PaymentsScreen/>}/><Route path="/notificacoes" element={<NotificationsScreen/>}/><Route path="/perfil" element={<ProfileScreen/>}/><Route path="/alunos" element={<StudentsScreen/>}/><Route path="/configuracoes" element={<SettingsScreen/>}/><Route path="/sobre" element={<AboutScreen/>}/><Route path="*" element={<Navigate to="/" replace/>}/></Routes>}
+function ProtectedRoute({ children }: { children: ReactNode }) {
+  if (!isDemoAuthenticated()) return <Navigate to="/login" replace />;
+  return children;
+}
+
+function Private({ children }: { children: ReactNode }) {
+  return <ProtectedRoute>{children}</ProtectedRoute>;
+}
+
+export function App() {
+  return (
+    <Routes>
+      <Route path="/login" element={<LoginScreen />} />
+      <Route path="/cadastro" element={<RegisterScreen />} />
+      <Route path="/" element={<Private><HomeScreen /></Private>} />
+      <Route path="/treinos" element={<Private><WorkoutsScreen /></Private>} />
+      <Route path="/treinos/ativo" element={<Private><ActiveWorkoutScreen /></Private>} />
+      <Route path="/evolucao" element={<Private><EvolutionScreen /></Private>} />
+      <Route path="/aulas" element={<Private><ClassesScreen /></Private>} />
+      <Route path="/pagamentos" element={<Private><PaymentsScreen /></Private>} />
+      <Route path="/notificacoes" element={<Private><NotificationsScreen /></Private>} />
+      <Route path="/perfil" element={<Private><ProfileScreen /></Private>} />
+      <Route path="/alunos" element={<Private><StudentsScreen /></Private>} />
+      <Route path="/configuracoes" element={<Private><SettingsScreen /></Private>} />
+      <Route path="/sobre" element={<Private><AboutScreen /></Private>} />
+      <Route path="*" element={<Navigate to={isDemoAuthenticated() ? "/" : "/login"} replace />} />
+    </Routes>
+  );
+}
