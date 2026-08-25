@@ -8,6 +8,7 @@ import "./styles.css";
 import "./phase2.css";
 import "./account.css";
 import "./turnstile.css";
+import "./trainer.css";
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
