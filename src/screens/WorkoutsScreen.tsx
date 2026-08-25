@@ -1,21 +1,52 @@
-import { CheckCircle2, Clock3, Dumbbell, Play, Weight } from "lucide-react";
-import { useState } from "react";
+import { CheckCircle2, Clock3, Dumbbell, Play, RefreshCw, Weight } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppShell } from "../components/AppShell";
 import { BrandLogo } from "../components/BrandLogo";
-import { workouts } from "../mocks/data";
+import { listOwnWorkoutPrograms, type WorkoutProgram } from "../services/workoutService";
 import { useAccount } from "../state/AccountContext";
 
-export function WorkoutsScreen(){
-  const navigate=useNavigate();
+export function WorkoutsScreen() {
+  const navigate = useNavigate();
   const { account } = useAccount();
-  const [selected,setSelected]=useState('B');
-  const workout=workouts.find(w=>w.id===selected) ?? workouts[1];
+  const [programs, setPrograms] = useState<WorkoutProgram[]>([]);
+  const [selectedId, setSelectedId] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const load = async () => {
+    try {
+      setLoading(true);
+      setError("");
+      const items = await listOwnWorkoutPrograms();
+      setPrograms(items);
+      setSelectedId((current) => items.some((item) => item.id === current) ? current : items[0]?.id ?? "");
+    } catch (err) {
+      setPrograms([]);
+      setError(readError(err, "Não foi possível carregar seus treinos."));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { void load(); }, []);
+  const workout = useMemo(() => programs.find((item) => item.id === selectedId) ?? programs[0] ?? null, [programs, selectedId]);
+
   return <AppShell title="Treinos"><div className="page-pad">
-    <section className="hero-card user-summary"><BrandLogo compact/><div className="hero-card__divider"/><div><h2>{account?.profile.full_name || 'Aluno'}</h2><span className="status-chip status-chip--success"><CheckCircle2 size={15}/> {account?.profile.status === 'active' ? 'Ativo' : 'Inativo'}</span><p><Clock3 size={15}/> Matrícula #{account?.profile.membership_number ?? '—'}</p></div></section>
-    <div className="segmented">{workouts.map(w=><button key={w.id} className={selected===w.id?'active':''} onClick={()=>setSelected(w.id)}>{w.title}</button>)}</div>
-    <section className="workout-header"><div className="round-icon green"><Dumbbell/></div><div><h2>{workout.title} • {workout.subtitle}</h2><p>{workout.exercises.length || 4} exercícios</p></div></section>
-    <div className="exercise-list">{(workout.exercises.length?workout.exercises:workouts[1].exercises).map((ex,index)=><article key={ex.id} className="exercise-card"><div className="exercise-thumb"><Dumbbell/></div><span className="number-dot">{index+1}</span><div className="exercise-main"><h3>{ex.name}</h3><div className="exercise-meta"><span><Dumbbell size={16}/><small>Séries x reps</small><b>{ex.sets}</b></span><span><Weight size={16}/><small>Carga sugerida</small><b>{ex.suggestedLoad}</b></span><span><Clock3 size={16}/><small>Descanso</small><b>{ex.restSeconds} seg</b></span></div></div></article>)}</div>
-    <button className="primary-button sticky-action" onClick={()=>navigate('/treinos/ativo')}><Play size={19}/> Iniciar treino</button>
-  </div></AppShell>
+    <section className="hero-card user-summary"><BrandLogo compact/><div className="hero-card__divider"/><div><h2>{account?.profile.full_name || "Aluno"}</h2><span className="status-chip status-chip--success"><CheckCircle2 size={15}/> {account?.profile.status === "active" ? "Ativo" : "Inativo"}</span><p><Clock3 size={15}/> Matrícula #{account?.profile.membership_number ?? "—"}</p></div></section>
+
+    {loading && <section className="section-card workout-empty-state"><RefreshCw className="spin"/><h2>Carregando sua ficha...</h2></section>}
+    {!loading && error && <section className="section-card workout-empty-state"><Dumbbell/><h2>Não foi possível carregar</h2><p>{error}</p><button className="outline-button" onClick={() => void load()}>Tentar novamente</button></section>}
+    {!loading && !error && programs.length === 0 && <section className="section-card workout-empty-state"><Dumbbell/><h2>Nenhum treino prescrito</h2><p>Quando o professor montar sua ficha, ela aparecerá aqui automaticamente.</p></section>}
+
+    {!loading && !error && workout && <>
+      <div className="segmented">{programs.map((item)=><button key={item.id} className={selectedId===item.id?"active":""} onClick={()=>setSelectedId(item.id)}>Treino {item.code}</button>)}</div>
+      <section className="workout-header"><div className="round-icon green"><Dumbbell/></div><div><h2>{workout.title}</h2><p>{workout.subtitle || `${workout.workout_exercises.length} exercícios`}</p></div></section>
+      {workout.notes && <div className="info-strip">{workout.notes}</div>}
+      <div className="exercise-list">{workout.workout_exercises.map((exercise,index)=><article key={exercise.id} className="exercise-card"><div className="exercise-thumb"><Dumbbell/></div><span className="number-dot">{index+1}</span><div className="exercise-main"><h3>{exercise.name}</h3><p className="exercise-muscle">{exercise.muscle_group}</p><div className="exercise-meta"><span><Dumbbell size={16}/><small>Séries x reps</small><b>{exercise.sets} x {exercise.reps_min}{exercise.reps_max !== exercise.reps_min ? `-${exercise.reps_max}` : ""}</b></span><span><Weight size={16}/><small>Carga sugerida</small><b>{exercise.suggested_load_kg == null ? "Livre" : `${exercise.suggested_load_kg} kg`}</b></span><span><Clock3 size={16}/><small>Descanso</small><b>{exercise.rest_seconds} seg</b></span></div>{exercise.notes && <small className="exercise-note">{exercise.notes}</small>}</div></article>)}</div>
+      <button className="primary-button sticky-action" disabled={workout.workout_exercises.length === 0} onClick={()=>navigate(`/treinos/ativo?program=${workout.id}`)}><Play size={19}/> Iniciar treino</button>
+    </>}
+  </div></AppShell>;
 }
+
+function readError(error: unknown, fallback: string) { if (error && typeof error === "object" && "message" in error) return String((error as { message?: unknown }).message || fallback); return fallback; }
