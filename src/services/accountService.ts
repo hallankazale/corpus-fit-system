@@ -5,6 +5,7 @@ export type ProfileStatus = "active" | "inactive" | "blocked";
 export type MembershipStatus = "pending" | "active" | "overdue" | "cancelled";
 export type PaymentMethod = "pix" | "card" | "cash" | "transfer" | "other";
 export type PaymentStatus = "pending" | "paid" | "failed" | "refunded";
+export type PaymentOrderStatus = "pending" | "paid" | "failed" | "cancelled" | "refunded" | "expired";
 
 export type AccountProfile = {
   id: string;
@@ -37,6 +38,8 @@ export type Membership = {
   amount_cents: number;
   next_due_date: string | null;
   access_enabled: boolean;
+  billing_interval_months: number;
+  last_payment_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -51,7 +54,39 @@ export type PaymentRecord = {
   paid_at: string | null;
   note: string | null;
   created_by: string | null;
+  provider?: string;
+  provider_payment_id?: string | null;
+  external_reference?: string | null;
   created_at: string;
+};
+
+export type PixCharge = {
+  orderId: string;
+  providerPaymentId: string | null;
+  amountCents: number;
+  status: PaymentOrderStatus;
+  qrCode: string | null;
+  qrCodeBase64: string | null;
+  expiresAt: string | null;
+};
+
+export type PaymentOrder = {
+  id: string;
+  user_id: string;
+  membership_id: string | null;
+  provider: string;
+  provider_payment_id: string | null;
+  external_reference: string;
+  amount_cents: number;
+  currency: string;
+  method: string;
+  status: PaymentOrderStatus;
+  pix_qr_code: string | null;
+  pix_qr_code_base64: string | null;
+  expires_at: string | null;
+  paid_at: string | null;
+  created_at: string;
+  updated_at: string;
 };
 
 export type AccountSnapshot = {
@@ -198,6 +233,34 @@ export async function listAdminPayments(userId: string): Promise<PaymentRecord[]
     .limit(20);
   if (error) throw error;
   return (data ?? []) as PaymentRecord[];
+}
+
+export async function createPixCharge(): Promise<PixCharge> {
+  if (import.meta.env.MODE === "test") {
+    return {
+      orderId: "test-order",
+      providerPaymentId: "123456",
+      amountCents: 9990,
+      status: "pending",
+      qrCode: "00020126TESTE-CORPUS-FIT-PIX",
+      qrCodeBase64: null,
+      expiresAt: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+    };
+  }
+
+  const api = client();
+  const { data, error } = await api.functions.invoke("create-pix", { body: {} });
+  if (error) throw error;
+  if (data?.error) throw new Error(String(data.error));
+  return data as PixCharge;
+}
+
+export async function getOwnPaymentOrder(orderId: string): Promise<PaymentOrder | null> {
+  if (import.meta.env.MODE === "test") return null;
+  const api = client();
+  const { data, error } = await api.from("payment_orders").select("*").eq("id", orderId).maybeSingle();
+  if (error) throw error;
+  return (data as PaymentOrder | null) ?? null;
 }
 
 export async function adminSetMembership(input: {
