@@ -1,4 +1,4 @@
-import { Bell, CalendarDays, ClipboardCheck, CreditCard, Dumbbell, Home, Info, LogOut, Moon, Settings, ShieldCheck, SunMedium, UserRound, UsersRound, X } from "lucide-react";
+import { Bell, CalendarDays, ClipboardCheck, CreditCard, DoorOpen, Dumbbell, Home, Info, LogOut, Moon, Settings, ShieldCheck, SunMedium, UserRound, UsersRound, X } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BrandLogo } from "./BrandLogo";
 import { useAppState } from "../state/AppState";
@@ -37,7 +37,10 @@ export function SideDrawer({ open, onClose }: { open: boolean; onClose: () => vo
         <span className="role-chip">{account ? roleLabels[account.profile.role] : "Usuário"}</span>
         <div className="side-drawer__links">
           {links.map(([path, label, Icon]) => <button key={path} className={location.pathname === path || (path !== "/" && location.pathname.startsWith(path)) ? "is-current" : ""} onClick={() => go(path)}><Icon size={21} /><span>{label}</span>{label === "Notificações" && unread > 0 && <b>{unread}</b>}</button>)}
-          {canAccessAdmin(account?.profile.role) && <button className={location.pathname.startsWith('/admin') ? 'is-current' : ''} onClick={() => go('/admin')}><ShieldCheck size={21}/><span>Administração</span></button>}
+          {canAccessAdmin(account?.profile.role) && <>
+            <button className={location.pathname.startsWith('/admin') ? 'is-current' : ''} onClick={() => go('/admin')}><ShieldCheck size={21}/><span>Administração</span></button>
+            <button className={location.pathname.startsWith('/catraca') ? 'is-current' : ''} onClick={() => go('/catraca')}><DoorOpen size={21}/><span>Catraca</span></button>
+          </>}
           <button onClick={toggleTheme}>{theme === "dark" ? <SunMedium size={21} /> : <Moon size={21} />}<span>{theme === "dark" ? "Modo claro" : "Modo escuro"}</span><span className={`mini-toggle ${theme === "dark" ? "is-active" : ""}`} /></button>
           <button onClick={() => go("/sobre")}><Info size={21} /><span>Sobre</span></button>
           <button className="danger-link" onClick={() => void logout()}><LogOut size={21} /><span>Sair</span></button>
