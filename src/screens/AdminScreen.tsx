@@ -62,8 +62,8 @@ export function AdminScreen() {
   const stats = useMemo(() => ({
     total: accounts.length,
     students: accounts.filter((item) => item.role === "student").length,
-    activePlans: accounts.filter((item) => item.membership?.status === "active").length,
-    access: accounts.filter((item) => item.membership?.access_enabled).length,
+    activePlans: accounts.filter((item) => item.role === "student" && item.membership?.status === "active").length,
+    access: accounts.filter((item) => item.role === "student" && item.membership?.access_enabled).length,
   }), [accounts]);
 
   const filtered = useMemo(() => {
@@ -73,6 +73,7 @@ export function AdminScreen() {
   }, [accounts, query]);
 
   const openManage = async (item: AdminAccount) => {
+    if (item.role !== "student") return;
     setSelected(item);
     setFeedback(null);
     setProfileStatus(item.status);
@@ -189,11 +190,15 @@ export function AdminScreen() {
                 <div className="admin-user-tags"><span>{roleLabels[item.role]}</span><span className={item.status === "blocked" ? "danger" : ""}>{profileStatusLabels[item.status]}</span></div>
               </div>
               <div className="admin-user-plan">
-                <b>{item.membership?.plan_name ?? "Sem plano"}</b>
-                <small>{item.membership ? membershipStatusLabels[item.membership.status] : "Plano não atribuído"}</small>
-                <span className={item.membership?.access_enabled ? "access-on" : "access-off"}>{item.membership?.access_enabled ? "Acesso liberado" : "Acesso bloqueado"}</span>
+                <b>{item.role === "student" ? (item.membership?.plan_name ?? "Sem plano") : "Conta interna"}</b>
+                <small>{item.role === "student" ? (item.membership ? membershipStatusLabels[item.membership.status] : "Plano não atribuído") : "Equipe da academia"}</small>
+                {item.role === "student" && <span className={item.membership?.access_enabled ? "access-on" : "access-off"}>{item.membership?.access_enabled ? "Acesso liberado" : "Acesso bloqueado"}</span>}
               </div>
-              <button className="outline-button admin-manage-button" onClick={() => void openManage(item)}><Settings2 size={17}/> Gerenciar</button>
+              {item.role === "student" ? (
+                <button className="outline-button admin-manage-button" onClick={() => void openManage(item)}><Settings2 size={17}/> Gerenciar</button>
+              ) : (
+                <span className="admin-help">Conta da equipe</span>
+              )}
             </article>
           ))}
         </section>
