@@ -14,6 +14,7 @@ import { ProfileScreen } from "./screens/ProfileScreen";
 import { RegisterScreen } from "./screens/RegisterScreen";
 import { SettingsScreen } from "./screens/SettingsScreen";
 import { StudentsScreen } from "./screens/StudentsScreen";
+import { TurnstileScreen } from "./screens/TurnstileScreen";
 import { WorkoutsScreen } from "./screens/WorkoutsScreen";
 
 function Private({ children }: { children: React.ReactNode }) { return <ProtectedRoute>{children}</ProtectedRoute>; }
@@ -35,6 +36,7 @@ export function App() {
       <Route path="/configuracoes" element={<Private><SettingsScreen /></Private>} />
       <Route path="/sobre" element={<Private><AboutScreen /></Private>} />
       <Route path="/admin" element={<Private><AdminRoute><AdminScreen /></AdminRoute></Private>} />
+      <Route path="/catraca" element={<Private><AdminRoute><TurnstileScreen /></AdminRoute></Private>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
