@@ -5,11 +5,12 @@ import { PaymentsScreen } from "../screens/PaymentsScreen";
 import { renderApp } from "./render";
 
 describe("Payment experience", () => {
-  it("explains that online payment needs the real gateway", async () => {
+  it("opens a PIX charge with copy-and-paste code", async () => {
     const user = userEvent.setup();
     renderApp(<PaymentsScreen />, ["/pagamentos"]);
     await user.click(screen.getByRole("button", { name: "Pagar mensalidade" }));
-    expect(screen.getByRole("dialog", { name: "Pagamento online" })).toBeInTheDocument();
-    expect(screen.getByText(/gateway de pagamento/i)).toBeInTheDocument();
+    expect(await screen.findByRole("dialog", { name: "Pagamento via PIX" })).toBeInTheDocument();
+    expect(await screen.findByText(/00020126TESTE-CORPUS-FIT-PIX/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Copiar PIX" })).toBeInTheDocument();
   });
 });
