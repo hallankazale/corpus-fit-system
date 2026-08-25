@@ -9,7 +9,18 @@ import "./phase2.css";
 import "./account.css";
 
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => undefined));
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js", { updateViaCache: "none" })
+      .then((registration) => registration.update())
+      .catch(() => undefined);
+
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      const key = "corpus-fit-sw-reloaded";
+      if (sessionStorage.getItem(key)) return;
+      sessionStorage.setItem(key, "1");
+      window.location.reload();
+    });
+  });
 }
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
