@@ -11,7 +11,11 @@ const testAccount: AccountSnapshot = {
     show_instagram: false, show_facebook: false, show_tiktok: false, show_whatsapp: false,
     created_at: "2026-01-01T00:00:00Z", updated_at: "2026-01-01T00:00:00Z",
   },
-  membership: { id: "test-membership", user_id: "test-user", plan_name: "Plano Teste", status: "active", amount_cents: 9990, next_due_date: null, access_enabled: true, created_at: "2026-01-01T00:00:00Z", updated_at: "2026-01-01T00:00:00Z" },
+  membership: {
+    id: "test-membership", user_id: "test-user", plan_name: "Plano Teste", status: "active", amount_cents: 9990,
+    next_due_date: null, access_enabled: true, billing_interval_months: 1, last_payment_at: null,
+    created_at: "2026-01-01T00:00:00Z", updated_at: "2026-01-01T00:00:00Z",
+  },
 };
 
 type AccountContextValue = { account: AccountSnapshot | null; loading: boolean; error: string | null; refreshAccount: () => Promise<void>; saveProfile: (patch: ProfilePatch) => Promise<void> };
