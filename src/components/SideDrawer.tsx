@@ -1,8 +1,9 @@
 import { Bell, CalendarDays, ClipboardCheck, CreditCard, Dumbbell, Info, LogOut, Moon, Settings, SunMedium, UserRound, UsersRound, X, Home } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BrandLogo } from "./BrandLogo";
 import { useAppState } from "../state/AppState";
-import { signOutDemo } from "../services/demoAuth";
+import { getCurrentUser, signOut } from "../services/authService";
 
 const links = [
   ["/", "Início", Home],
@@ -20,15 +21,25 @@ export function SideDrawer({ open, onClose }: { open: boolean; onClose: () => vo
   const navigate = useNavigate();
   const location = useLocation();
   const { notifications, theme, toggleTheme } = useAppState();
-  const unread = notifications.filter((n) => !n.read).length;
+  const [displayName, setDisplayName] = useState("Aluno");
+  const unread = notifications.filter((notification) => !notification.read).length;
+
+  useEffect(() => {
+    if (!open) return;
+    getCurrentUser().then((user) => {
+      if (!user) return;
+      const name = String(user.user_metadata?.full_name ?? "").trim();
+      setDisplayName(name || user.email || "Aluno");
+    });
+  }, [open]);
 
   const go = (path: string) => {
     navigate(path);
     onClose();
   };
 
-  const logout = () => {
-    signOutDemo();
+  const logout = async () => {
+    await signOut();
     onClose();
     navigate("/login", { replace: true });
   };
@@ -40,7 +51,7 @@ export function SideDrawer({ open, onClose }: { open: boolean; onClose: () => vo
           <BrandLogo compact />
           <button className="icon-button icon-button--light" onClick={onClose} aria-label="Fechar menu"><X /></button>
         </div>
-        <h3>Hallan Fernando</h3>
+        <h3>{displayName}</h3>
         <span className="role-chip">Aluno</span>
         <div className="side-drawer__links">
           {links.map(([path, label, Icon]) => (

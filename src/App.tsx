@@ -1,6 +1,5 @@
-import type { ReactNode } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
-import { isDemoAuthenticated } from "./services/demoAuth";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AboutScreen } from "./screens/AboutScreen";
 import { ActiveWorkoutScreen } from "./screens/ActiveWorkoutScreen";
 import { ClassesScreen } from "./screens/ClassesScreen";
@@ -15,12 +14,7 @@ import { SettingsScreen } from "./screens/SettingsScreen";
 import { StudentsScreen } from "./screens/StudentsScreen";
 import { WorkoutsScreen } from "./screens/WorkoutsScreen";
 
-function ProtectedRoute({ children }: { children: ReactNode }) {
-  if (!isDemoAuthenticated()) return <Navigate to="/login" replace />;
-  return children;
-}
-
-function Private({ children }: { children: ReactNode }) {
+function Private({ children }: { children: React.ReactNode }) {
   return <ProtectedRoute>{children}</ProtectedRoute>;
 }
 
@@ -40,7 +34,7 @@ export function App() {
       <Route path="/alunos" element={<Private><StudentsScreen /></Private>} />
       <Route path="/configuracoes" element={<Private><SettingsScreen /></Private>} />
       <Route path="/sobre" element={<Private><AboutScreen /></Private>} />
-      <Route path="*" element={<Navigate to={isDemoAuthenticated() ? "/" : "/login"} replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
