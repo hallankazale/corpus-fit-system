@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AdminRoute } from "./components/AdminRoute";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { TrainerRoute } from "./components/TrainerRoute";
 import { AboutScreen } from "./screens/AboutScreen";
 import { ActiveWorkoutScreen } from "./screens/ActiveWorkoutScreen";
 import { AdminScreen } from "./screens/AdminScreen";
@@ -14,6 +15,7 @@ import { ProfileScreen } from "./screens/ProfileScreen";
 import { RegisterScreen } from "./screens/RegisterScreen";
 import { SettingsScreen } from "./screens/SettingsScreen";
 import { StudentsScreen } from "./screens/StudentsScreen";
+import { TrainerScreen } from "./screens/TrainerScreen";
 import { TurnstileScreen } from "./screens/TurnstileScreen";
 import { WorkoutsScreen } from "./screens/WorkoutsScreen";
 
@@ -35,6 +37,7 @@ export function App() {
       <Route path="/alunos" element={<Private><StudentsScreen /></Private>} />
       <Route path="/configuracoes" element={<Private><SettingsScreen /></Private>} />
       <Route path="/sobre" element={<Private><AboutScreen /></Private>} />
+      <Route path="/professor" element={<Private><TrainerRoute><TrainerScreen /></TrainerRoute></Private>} />
       <Route path="/admin" element={<Private><AdminRoute><AdminScreen /></AdminRoute></Private>} />
       <Route path="/catraca" element={<Private><AdminRoute><TurnstileScreen /></AdminRoute></Private>} />
       <Route path="*" element={<Navigate to="/" replace />} />
