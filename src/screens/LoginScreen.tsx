@@ -5,6 +5,7 @@ import { BrandLogo } from "../components/BrandLogo";
 import { GoogleIcon } from "../components/BrandIcons";
 import { Modal } from "../components/Modal";
 import { authenticateDemo, DEMO_CREDENTIALS } from "../services/demoAuth";
+import "../styles/login-security.css";
 
 export function LoginScreen() {
   const navigate = useNavigate();
@@ -74,23 +75,8 @@ export function LoginScreen() {
         <div className="auth-footer">Ainda não tem conta? <Link to="/cadastro">Criar conta</Link></div>
       </form>
 
-      {forgotOpen && (
-        <Modal title="Recuperar senha" onClose={() => setForgotOpen(false)}>
-          <div className="modal-content-stack">
-            <p>Na integração real, enviaremos um link de recuperação para o e-mail cadastrado.</p>
-            <button className="primary-button" onClick={() => setForgotOpen(false)}>Fechar</button>
-          </div>
-        </Modal>
-      )}
-
-      {googleOpen && (
-        <Modal title="Login com Google" onClose={() => setGoogleOpen(false)}>
-          <div className="modal-content-stack">
-            <p>O login real com Google será ativado quando conectarmos o Supabase. Ele não libera mais o sistema sem autenticação.</p>
-            <button className="primary-button" onClick={() => setGoogleOpen(false)}>Entendi</button>
-          </div>
-        </Modal>
-      )}
+      {forgotOpen && <Modal title="Recuperar senha" onClose={() => setForgotOpen(false)}><div className="modal-content-stack"><p>Na integração real, enviaremos um link de recuperação para o e-mail cadastrado.</p><button className="primary-button" onClick={() => setForgotOpen(false)}>Fechar</button></div></Modal>}
+      {googleOpen && <Modal title="Login com Google" onClose={() => setGoogleOpen(false)}><div className="modal-content-stack"><p>O login real com Google será ativado quando conectarmos o Supabase. Ele não libera mais o sistema sem autenticação.</p><button className="primary-button" onClick={() => setGoogleOpen(false)}>Entendi</button></div></Modal>}
     </div>
   );
 }
