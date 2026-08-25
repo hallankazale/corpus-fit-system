@@ -1,1 +1,315 @@
-PLACEHOLDER
+:root[data-theme="dark"] {
+  --surface: #0b1723;
+  --card: #102232;
+  --text: #f4f8fb;
+  --muted: #98a8b7;
+  --border: #234055;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.34);
+}
+
+:root[data-theme="dark"] html,
+:root[data-theme="dark"] body {
+  background: radial-gradient(circle at top, #16344a, #05111a 70%);
+}
+
+:root[data-theme="dark"] .phone-shell,
+:root[data-theme="dark"] .auth-shell,
+:root[data-theme="dark"] .section-card,
+:root[data-theme="dark"] .exercise-card,
+:root[data-theme="dark"] .workout-header,
+:root[data-theme="dark"] .metric-card,
+:root[data-theme="dark"] .quick-card,
+:root[data-theme="dark"] .sets-card,
+:root[data-theme="dark"] .register-card,
+:root[data-theme="dark"] .auth-card,
+:root[data-theme="dark"] .payment-row,
+:root[data-theme="dark"] .class-card,
+:root[data-theme="dark"] .student-card,
+:root[data-theme="dark"] .notification-card,
+:root[data-theme="dark"] .payment-tabs,
+:root[data-theme="dark"] .search-row label,
+:root[data-theme="dark"] .input-wrap,
+:root[data-theme="dark"] .field-block input,
+:root[data-theme="dark"] .field-block textarea,
+:root[data-theme="dark"] .modal-card,
+:root[data-theme="dark"] .topbar {
+  color: var(--text);
+}
+
+:root[data-theme="dark"] .page-pad,
+:root[data-theme="dark"] .app-content,
+:root[data-theme="dark"] .phone-shell,
+:root[data-theme="dark"] .auth-shell {
+  background: var(--surface);
+}
+
+:root[data-theme="dark"] .section-card,
+:root[data-theme="dark"] .exercise-card,
+:root[data-theme="dark"] .workout-header,
+:root[data-theme="dark"] .metric-card,
+:root[data-theme="dark"] .quick-card,
+:root[data-theme="dark"] .sets-card,
+:root[data-theme="dark"] .register-card,
+:root[data-theme="dark"] .auth-card,
+:root[data-theme="dark"] .payment-row,
+:root[data-theme="dark"] .class-card,
+:root[data-theme="dark"] .student-card,
+:root[data-theme="dark"] .notification-card,
+:root[data-theme="dark"] .modal-card,
+:root[data-theme="dark"] .input-wrap,
+:root[data-theme="dark"] .search-row label {
+  background: var(--card);
+  border-color: rgba(255,255,255,.08);
+}
+
+:root[data-theme="dark"] .text-link,
+:root[data-theme="dark"] p,
+:root[data-theme="dark"] small,
+:root[data-theme="dark"] span,
+:root[data-theme="dark"] .action-card p,
+:root[data-theme="dark"] .workout-header p,
+:root[data-theme="dark"] .chart-labels,
+:root[data-theme="dark"] .professional p,
+:root[data-theme="dark"] .professional small {
+  color: var(--muted);
+}
+
+:root[data-theme="dark"] .bottom-nav,
+:root[data-theme="dark"] .side-drawer,
+:root[data-theme="dark"] .payment-tabs,
+:root[data-theme="dark"] .segmented,
+:root[data-theme="dark"] .days-row button,
+:root[data-theme="dark"] .filter-chips button,
+:root[data-theme="dark"] .setting-row,
+:root[data-theme="dark"] .bio-field textarea,
+:root[data-theme="dark"] .pending-card,
+:root[data-theme="dark"] .rest-timer {
+  background: var(--card);
+  color: var(--text);
+}
+
+:root[data-theme="dark"] .bottom-nav__item,
+:root[data-theme="dark"] .social-row div small,
+:root[data-theme="dark"] .public-preview p,
+:root[data-theme="dark"] .public-preview span,
+:root[data-theme="dark"] .class-info p,
+:root[data-theme="dark"] .notification-card p,
+:root[data-theme="dark"] .notification-card small {
+  color: var(--muted);
+}
+
+.input-wrap--action {
+  padding-right: 8px;
+}
+
+.field-icon-button {
+  border: 0;
+  background: transparent;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  color: var(--muted);
+  border-radius: 10px;
+}
+
+.inline-link-button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: var(--green);
+  text-decoration: underline;
+}
+
+.modal-content-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 6px;
+}
+
+.modal-content-stack p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.social-mark--brand {
+  background: transparent;
+  width: 34px;
+  height: 34px;
+}
+
+.social-icons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.social-icons small {
+  color: var(--muted);
+}
+
+.google-button svg {
+  flex: none;
+}
+
+.mini-toggle {
+  width: 38px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.22);
+  position: relative;
+  margin-left: auto;
+}
+
+.mini-toggle::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform .2s ease;
+}
+
+.mini-toggle.is-active {
+  background: rgba(255,196,0,.35);
+}
+
+.mini-toggle.is-active::after {
+  transform: translateX(16px);
+}
+
+@media (max-width: 380px) {
+  .two-col,
+  .progress-grid,
+  .active-hero,
+  .exercise-meta,
+  .measurement-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sets-head,
+  .set-row {
+    grid-template-columns: 42px 1fr 1fr;
+  }
+
+  .sets-head span:last-child,
+  .set-row .set-status {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Premium mobile polish v0.2 */
+html { -webkit-tap-highlight-color: transparent; }
+body { overscroll-behavior-y: none; }
+.phone-shell { isolation: isolate; }
+.page-pad { padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
+
+.topbar {
+  backdrop-filter: saturate(130%) blur(14px);
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+.topbar__title { letter-spacing: -.02em; }
+.icon-button, .notification-button { transition: transform .16s ease, background .16s ease; }
+.icon-button:active, .notification-button:active { transform: scale(.94); }
+
+.bottom-nav {
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+  min-height: calc(70px + env(safe-area-inset-bottom));
+  background: rgba(5,24,38,.96);
+  backdrop-filter: blur(18px) saturate(135%);
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+.bottom-nav__item { min-height: 58px; transition: color .18s ease, transform .18s ease, background .18s ease; }
+.bottom-nav/_item svg { transition: transform .18s ease; }
+.bottom-nav__item:active { transform: scale(.96); }
+.bottom-nav/_item.is-active svg { transform: translateY(-2px) scale(1.06); }
+.bottom-nav__item.is-active { background: rgba(255,196,0,.07); }
+
+.primary-button, .yellow-button, .outline-button,
+.quick-card, .three-actions button, .profile-actions button,
+.settings-action, .student-card__body button, .class-action button {
+  transition: transform .16s ease, box-shadow .16s ease, filter .16s ease, background .16s ease;
+  touch-action: manipulation;
+}
+.primary-button:active, .yellow-button:active, .outline-button:active,
+.quick-card:active, .three-actions button:active, .profile-actions button:active,
+.settings-action:active, .student-card__body button:active, .class-action button:active {
+  transform: translateY(1px) scale(.985);
+}
+.primary-button:hover { filter: brightness(1.03); box-shadow: 0 8px 20px rgba(8,123,67,.23); }
+.yellow-button:hover { filter: brightness(1.02); box-shadow: 0 8px 18px rgba(255,196,0,.18); }
+
+.section-card, .exercise-card, .metric-card, .quick-card, .student-card, .notification-card, .class-card {
+  border: 1px solid rgba(7,31,51,.07);
+}
+.section-card, .exercise-card, .metric-card, .quick-card, .student-card, .notification-card, .class-card,
+.hero-card { transition: box-shadow .18s ease, transform .18s ease, border-color .18s ease; }
+
+.quick-card { min-height: 82px; }
+.quick-card svg { width: 23px; height: 23px; }
+.quick-card span { font-weight: 750; }
+
+.side-drawer__links button.is-current {
+  background: rgba(255,255,255,.10);
+  color: var(--yellow);
+  box-shadow: inset 3px 0 0 var(--yellow);
+}
+.side-drawer__links button:first-child:not(.is-current) { background: transparent; color: white; }
+
+.hero-card { box-shadow: 0 14px 32px rgba(5,31,51,.16); }
+.profile-avatar { box-shadow: 0 8px 22px rgba(0,0,0,.22); }
+
+.input-wrap, .bio-field textarea, .search-row label {
+  transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.input-wrap:focus-within, .bio-field textarea:focus, .search-row label:focus-within {
+  border-color: rgba(8,123,67,.55);
+  box-shadow: 0 0 0 4px rgba(8,123,67,.10);
+}
+
+.filter-chips button, .days-row button, .segmented button, .payment-tabs button {
+  transition: background .16s ease, color .16s ease, transform .16s ease, box-shadow .16s ease;
+}
+.filter-chips button:active, .days-row button:active, .segmented button:active, .payment-tabs button:active { transform: scale(.97); }
+
+.notification-card.unread { box-shadow: 0 8px 22px rgba(8,123,67,.10); }
+.notification-card.unread::before { width: 4px; }
+
+.toast {
+  bottom: calc(86px + env(safe-area-inset-bottom));
+  animation: toast-in .24s ease both;
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translate(-50%, 10px) scale(.98); }
+  to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+
+.modal-backdrop { backdrop-filter: blur(5px); }
+.modal-card { animation: modal-in .2s ease both; }
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(14px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+:root[data-theme="dark"] .section-card,
+:root[data-theme="dark"] .exercise-card,
+:root[data-theme="dark"] .metric-card,
+:root[data-theme="dark"] .quick-card,
+:root[data-theme="dark"] .student-card,
+:root[data-theme="dark"] .notification-card,
+:root[data-theme="dark"] .class-card {
+  border-color: rgba(255,255,255,.075);
+}
+:root[data-theme="dark"] .bottom-nav { background: rgba(4,15,24,.96); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+}
+.settings-action--danger { color: var(--danger); }
