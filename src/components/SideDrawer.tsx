@@ -2,6 +2,7 @@ import { Bell, CalendarDays, ClipboardCheck, CreditCard, Dumbbell, Info, LogOut,
 import { useLocation, useNavigate } from "react-router-dom";
 import { BrandLogo } from "./BrandLogo";
 import { useAppState } from "../state/AppState";
+import { signOutDemo } from "../services/demoAuth";
 
 const links = [
   ["/", "Início", Home],
@@ -20,19 +21,24 @@ export function SideDrawer({ open, onClose }: { open: boolean; onClose: () => vo
   const location = useLocation();
   const { notifications, theme, toggleTheme } = useAppState();
   const unread = notifications.filter((n) => !n.read).length;
+
   const go = (path: string) => {
     navigate(path);
     onClose();
   };
 
+  const logout = () => {
+    signOutDemo();
+    onClose();
+    navigate("/login", { replace: true });
+  };
+
   return (
     <div className={`drawer-backdrop ${open ? "is-open" : ""}`} onClick={onClose} aria-hidden={!open}>
-      <aside className={`side-drawer ${open ? "is-open" : ""}`} onClick={(e) => e.stopPropagation()}>
+      <aside className={`side-drawer ${open ? "is-open" : ""}`} onClick={(event) => event.stopPropagation()}>
         <div className="side-drawer__head">
           <BrandLogo compact />
-          <button className="icon-button icon-button--light" onClick={onClose} aria-label="Fechar menu">
-            <X />
-          </button>
+          <button className="icon-button icon-button--light" onClick={onClose} aria-label="Fechar menu"><X /></button>
         </div>
         <h3>Hallan Fernando</h3>
         <span className="role-chip">Aluno</span>
@@ -49,14 +55,8 @@ export function SideDrawer({ open, onClose }: { open: boolean; onClose: () => vo
             <span>{theme === "dark" ? "Modo claro" : "Modo escuro"}</span>
             <span className={`mini-toggle ${theme === "dark" ? "is-active" : ""}`} />
           </button>
-          <button onClick={() => go("/sobre")}>
-            <Info size={21} />
-            <span>Sobre</span>
-          </button>
-          <button className="danger-link" onClick={() => go("/login")}>
-            <LogOut size={21} />
-            <span>Sair</span>
-          </button>
+          <button onClick={() => go("/sobre")}><Info size={21} /><span>Sobre</span></button>
+          <button className="danger-link" onClick={logout}><LogOut size={21} /><span>Sair</span></button>
         </div>
       </aside>
     </div>
