@@ -1,7 +1,9 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import { AdminRoute } from "./components/AdminRoute";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AboutScreen } from "./screens/AboutScreen";
 import { ActiveWorkoutScreen } from "./screens/ActiveWorkoutScreen";
+import { AdminScreen } from "./screens/AdminScreen";
 import { ClassesScreen } from "./screens/ClassesScreen";
 import { EvolutionScreen } from "./screens/EvolutionScreen";
 import { HomeScreen } from "./screens/HomeScreen";
@@ -14,9 +16,7 @@ import { SettingsScreen } from "./screens/SettingsScreen";
 import { StudentsScreen } from "./screens/StudentsScreen";
 import { WorkoutsScreen } from "./screens/WorkoutsScreen";
 
-function Private({ children }: { children: React.ReactNode }) {
-  return <ProtectedRoute>{children}</ProtectedRoute>;
-}
+function Private({ children }: { children: React.ReactNode }) { return <ProtectedRoute>{children}</ProtectedRoute>; }
 
 export function App() {
   return (
@@ -34,6 +34,7 @@ export function App() {
       <Route path="/alunos" element={<Private><StudentsScreen /></Private>} />
       <Route path="/configuracoes" element={<Private><SettingsScreen /></Private>} />
       <Route path="/sobre" element={<Private><AboutScreen /></Private>} />
+      <Route path="/admin" element={<Private><AdminRoute><AdminScreen /></AdminRoute></Private>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
