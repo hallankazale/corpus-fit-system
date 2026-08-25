@@ -17,6 +17,6 @@ describe("Primary interactions", () => {
     const user = userEvent.setup();
     renderApp(<ActiveWorkoutScreen />, ["/treinos/ativo"]);
     await user.click(screen.getByRole("button", { name: /Próximo exercício/i }));
-    expect(screen.getByText("Crucifixo inclinado")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: "Crucifixo inclinado" })).toBeInTheDocument();
   });
 });
