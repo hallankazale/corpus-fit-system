@@ -7,6 +7,7 @@ import { renderApp } from "./render";
 vi.mock("../services/authService", () => ({
   signInWithEmail: vi.fn().mockResolvedValue({ ok: false, error: "E-mail ou senha incorretos." }),
   requestPasswordReset: vi.fn().mockResolvedValue({ ok: true, error: null }),
+  subscribeToAuth: vi.fn(() => () => undefined),
 }));
 
 describe("LoginScreen", () => {
