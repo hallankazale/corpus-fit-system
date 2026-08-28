@@ -1,7 +1,16 @@
-import { ChevronDown, Dumbbell, Film, Link2, Plus, RefreshCw, Save, Trash2, UserRound, Weight } from "lucide-react";
+import { BookOpen, ChevronDown, Dumbbell, Film, Link2, Plus, RefreshCw, Save, Search, Trash2, UserRound, Weight, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AppShell } from "../components/AppShell";
 import { ExerciseMedia } from "../components/ExerciseMedia";
+import {
+  equipmentLabel,
+  libraryImageUrl,
+  libraryInstructions,
+  loadExerciseLibrary,
+  muscleLabel,
+  searchExerciseLibrary,
+  type LibraryExercise,
+} from "../services/exerciseLibraryService";
 import {
   listStudentWorkoutPrograms,
   listWorkoutStudents,
@@ -38,6 +47,14 @@ export function TrainerScreen() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [feedback, setFeedback] = useState<{ tone: "success" | "error"; text: string } | null>(null);
+
+  const [libraryOpen, setLibraryOpen] = useState(false);
+  const [libraryItems, setLibraryItems] = useState<LibraryExercise[]>([]);
+  const [libraryLoading, setLibraryLoading] = useState(false);
+  const [libraryError, setLibraryError] = useState("");
+  const [libraryQuery, setLibraryQuery] = useState("");
+  const [libraryMuscle, setLibraryMuscle] = useState("");
+  const [libraryEquipment, setLibraryEquipment] = useState("");
 
   const loadStudents = useCallback(async () => {
     try {
@@ -100,6 +117,47 @@ export function TrainerScreen() {
 
   const removeExercise = (index: number) => setExercises((current) => current.filter((_, itemIndex) => itemIndex !== index));
 
+  const openLibrary = async () => {
+    setLibraryOpen(true);
+    if (libraryItems.length > 0 || libraryLoading) return;
+    try {
+      setLibraryLoading(true);
+      setLibraryError("");
+      setLibraryItems(await loadExerciseLibrary());
+    } catch (error) {
+      setLibraryError(readError(error, "Não foi possível carregar a biblioteca."));
+    } finally {
+      setLibraryLoading(false);
+    }
+  };
+
+  const libraryMuscles = useMemo(() => Array.from(new Set(libraryItems.flatMap((item) => item.primaryMuscles))).sort(), [libraryItems]);
+  const libraryEquipments = useMemo(() => Array.from(new Set(libraryItems.map((item) => item.equipment).filter((item): item is string => Boolean(item)))).sort(), [libraryItems]);
+  const libraryResults = useMemo(
+    () => searchExerciseLibrary(libraryItems, libraryQuery, libraryMuscle, libraryEquipment).slice(0, 30),
+    [libraryItems, libraryQuery, libraryMuscle, libraryEquipment],
+  );
+
+  const addFromLibrary = (item: LibraryExercise) => {
+    const draft: WorkoutExerciseDraft = {
+      name: item.name,
+      muscle_group: item.primaryMuscles.map(muscleLabel).join(" / "),
+      sets: 3,
+      reps_min: 8,
+      reps_max: 12,
+      suggested_load_kg: null,
+      rest_seconds: 60,
+      notes: libraryInstructions(item),
+      media_url: libraryImageUrl(item),
+      media_type: libraryImageUrl(item) ? "image" : "none",
+      media_attribution: "Free Exercise DB • Public Domain / Unlicense",
+    };
+    setExercises((current) => current.length === 1 && !current[0].name.trim() ? [draft] : [...current, draft]);
+    setLibraryOpen(false);
+    setFeedback({ tone: "success", text: `${item.name} adicionado ao Treino ${code}.` });
+    window.setTimeout(() => setFeedback(null), 1800);
+  };
+
   const save = async () => {
     if (!studentId) return setFeedback({ tone: "error", text: "Selecione um aluno." });
     if (!title.trim()) return setFeedback({ tone: "error", text: "Informe o nome do treino." });
@@ -149,7 +207,32 @@ export function TrainerScreen() {
           <label className="admin-wide-label"><span>Observações gerais</span><textarea value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Orientações do professor..." /></label>
         </section>
 
-        <div className="trainer-exercise-heading"><div><h2>Exercícios</h2><p>{exercises.length} exercício(s)</p></div><button className="outline-button compact" onClick={() => setExercises((current) => [...current, emptyExercise()])}><Plus /> Adicionar</button></div>
+        <div className="trainer-exercise-heading">
+          <div><h2>Exercícios</h2><p>{exercises.length} exercício(s)</p></div>
+          <div className="trainer-heading-actions">
+            <button className="outline-button compact" onClick={() => void openLibrary()}><BookOpen /> Biblioteca</button>
+            <button className="outline-button compact" onClick={() => setExercises((current) => [...current, emptyExercise()])}><Plus /> Manual</button>
+          </div>
+        </div>
+
+        {libraryOpen && <section className="section-card exercise-library">
+          <div className="exercise-library-head"><div><h2><BookOpen /> Biblioteca de exercícios</h2><p>Base pública com 800+ exercícios. Pesquise em português ou inglês.</p></div><button className="icon-button" onClick={() => setLibraryOpen(false)} aria-label="Fechar biblioteca"><X /></button></div>
+          <div className="library-search"><Search /><input value={libraryQuery} onChange={(event) => setLibraryQuery(event.target.value)} placeholder="Ex.: supino, agachamento, bíceps..." autoFocus /></div>
+          <div className="library-filters">
+            <select value={libraryMuscle} onChange={(event) => setLibraryMuscle(event.target.value)}><option value="">Todos os músculos</option>{libraryMuscles.map((value) => <option value={value} key={value}>{muscleLabel(value)}</option>)}</select>
+            <select value={libraryEquipment} onChange={(event) => setLibraryEquipment(event.target.value)}><option value="">Todos os equipamentos</option>{libraryEquipments.map((value) => <option value={value} key={value}>{equipmentLabel(value)}</option>)}</select>
+          </div>
+          {libraryLoading && <div className="library-state"><RefreshCw className="spin"/><span>Carregando biblioteca...</span></div>}
+          {!libraryLoading && libraryError && <div className="library-state error"><span>{libraryError}</span><button className="outline-button compact" onClick={() => { setLibraryItems([]); void openLibrary(); }}>Tentar novamente</button></div>}
+          {!libraryLoading && !libraryError && <>
+            <div className="library-count">{libraryResults.length}{libraryResults.length === 30 ? "+" : ""} resultado(s)</div>
+            <div className="library-grid">{libraryResults.map((item) => <article className="library-card" key={item.id}>
+              <div className="library-media">{libraryImageUrl(item) ? <img src={libraryImageUrl(item)} alt={item.name} loading="lazy"/> : <Dumbbell />}</div>
+              <div className="library-card-body"><h3>{item.name}</h3><p>{item.primaryMuscles.map(muscleLabel).join(" • ") || "Geral"}</p><div className="library-tags"><span>{equipmentLabel(item.equipment)}</span><span>{item.level || "geral"}</span></div><button className="primary-button compact" onClick={() => addFromLibrary(item)}><Plus /> Adicionar ao treino</button></div>
+            </article>)}</div>
+          </>}
+          <small className="library-license">Fonte: Free Exercise DB • conteúdo em domínio público / Unlicense. GIFs próprios/licenciados podem ser adicionados depois em cada exercício.</small>
+        </section>}
 
         <div className="trainer-exercise-list">
           {exercises.map((exercise, index) => (
