@@ -1,6 +1,7 @@
-import { ChevronDown, Dumbbell, Plus, RefreshCw, Save, Trash2, UserRound, Weight } from "lucide-react";
+import { ChevronDown, Dumbbell, Film, Link2, Plus, RefreshCw, Save, Trash2, UserRound, Weight } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AppShell } from "../components/AppShell";
+import { ExerciseMedia } from "../components/ExerciseMedia";
 import {
   listStudentWorkoutPrograms,
   listWorkoutStudents,
@@ -20,6 +21,9 @@ const emptyExercise = (): WorkoutExerciseDraft => ({
   suggested_load_kg: null,
   rest_seconds: 60,
   notes: "",
+  media_url: "",
+  media_type: "none",
+  media_attribution: "",
 });
 
 export function TrainerScreen() {
@@ -78,6 +82,9 @@ export function TrainerScreen() {
         suggested_load_kg: item.suggested_load_kg,
         rest_seconds: item.rest_seconds,
         notes: item.notes,
+        media_url: item.media_url ?? "",
+        media_type: item.media_type ?? "none",
+        media_attribution: item.media_attribution ?? "",
       })));
       return;
     }
@@ -97,6 +104,7 @@ export function TrainerScreen() {
     if (!studentId) return setFeedback({ tone: "error", text: "Selecione um aluno." });
     if (!title.trim()) return setFeedback({ tone: "error", text: "Informe o nome do treino." });
     if (exercises.length === 0 || exercises.some((item) => !item.name.trim())) return setFeedback({ tone: "error", text: "Todo exercício precisa ter um nome." });
+    if (exercises.some((item) => item.media_url.trim() && !item.media_url.trim().startsWith("https://"))) return setFeedback({ tone: "error", text: "Os GIFs e vídeos precisam usar endereço HTTPS." });
     try {
       setSaving(true);
       setFeedback(null);
@@ -156,6 +164,16 @@ export function TrainerScreen() {
                 <label><span>Descanso (seg)</span><input type="number" min="0" max="900" value={exercise.rest_seconds} onChange={(event) => updateExercise(index, { rest_seconds: numberValue(event.target.value, 0) })} /></label>
               </div>
               <label className="admin-wide-label"><span>Observação do exercício</span><input value={exercise.notes} onChange={(event) => updateExercise(index, { notes: event.target.value })} placeholder="Ex.: controlar a descida" /></label>
+
+              <section className="trainer-media-editor">
+                <div className="admin-action-title"><Film /><div><b>Vídeo / GIF demonstrativo</b><small>Use mídia própria ou com licença de reutilização.</small></div></div>
+                <div className="trainer-form-grid">
+                  <label><span>Tipo de mídia</span><select value={exercise.media_type} onChange={(event) => updateExercise(index, { media_type: event.target.value as WorkoutExerciseDraft["media_type"] })}><option value="none">Sem mídia</option><option value="gif">GIF animado</option><option value="video">Vídeo MP4/WebM</option><option value="image">Imagem</option></select></label>
+                  <label><span>URL HTTPS</span><div className="input-with-icon"><Link2 /><input type="url" value={exercise.media_url} onChange={(event) => updateExercise(index, { media_url: event.target.value, media_type: event.target.value && exercise.media_type === "none" ? "gif" : exercise.media_type })} placeholder="https://.../supino.gif" /></div></label>
+                </div>
+                <label className="admin-wide-label"><span>Crédito / licença</span><input value={exercise.media_attribution} onChange={(event) => updateExercise(index, { media_attribution: event.target.value })} placeholder="Ex.: Vídeo próprio da academia" /></label>
+                {exercise.media_url.trim() && <div className="trainer-media-preview"><ExerciseMedia exercise={exercise} /><small>Pré-visualização</small></div>}
+              </section>
             </article>
           ))}
         </div>
