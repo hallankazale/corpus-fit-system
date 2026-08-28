@@ -19,6 +19,9 @@ export type WorkoutExercise = {
   suggested_load_kg: number | null;
   rest_seconds: number;
   notes: string;
+  media_url: string | null;
+  media_type: "none" | "gif" | "video" | "image";
+  media_attribution: string;
 };
 
 export type WorkoutProgram = {
@@ -44,6 +47,9 @@ export type WorkoutExerciseDraft = {
   suggested_load_kg: number | null;
   rest_seconds: number;
   notes: string;
+  media_url: string;
+  media_type: WorkoutExercise["media_type"];
+  media_attribution: string;
 };
 
 export type WorkoutSession = {
@@ -63,7 +69,13 @@ function client() {
 function normalizeProgram(row: Record<string, unknown>): WorkoutProgram {
   const exercises = ((row.workout_exercises ?? []) as WorkoutExercise[])
     .slice()
-    .sort((a, b) => a.position - b.position);
+    .sort((a, b) => a.position - b.position)
+    .map((exercise) => ({
+      ...exercise,
+      media_url: exercise.media_url || null,
+      media_type: exercise.media_type || "none",
+      media_attribution: exercise.media_attribution || "",
+    }));
   return { ...(row as unknown as WorkoutProgram), workout_exercises: exercises };
 }
 
@@ -138,6 +150,9 @@ export async function saveWorkoutProgram(input: {
     suggested_load_kg: item.suggested_load_kg,
     rest_seconds: item.rest_seconds,
     notes: item.notes.trim(),
+    media_url: item.media_url.trim(),
+    media_type: item.media_url.trim() ? item.media_type : "none",
+    media_attribution: item.media_attribution.trim(),
   }));
   const { error: exerciseError } = await api.rpc("trainer_replace_exercises", {
     p_program_id: saved.id,
