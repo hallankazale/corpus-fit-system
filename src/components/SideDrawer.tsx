@@ -1,4 +1,4 @@
-import { Bell, CalendarDays, ClipboardCheck, CreditCard, DoorOpen, Dumbbell, GraduationCap, Home, Info, LogOut, Moon, Settings, ShieldCheck, SunMedium, UserRound, UsersRound, X } from "lucide-react";
+import { Activity, Bell, CalendarDays, ClipboardCheck, CreditCard, DoorOpen, Dumbbell, GraduationCap, Home, Info, LogOut, Moon, Settings, ShieldCheck, SunMedium, UserRound, UsersRound, X } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { BrandLogo } from "./BrandLogo";
 import { useAppState } from "../state/AppState";
@@ -9,6 +9,7 @@ import { useAccount } from "../state/AccountContext";
 const links = [
   ["/", "Início", Home],
   ["/treinos", "Treinos", Dumbbell],
+  ["/saude", "Nutrição & Cardio", Activity],
   ["/evolucao", "Avaliações", ClipboardCheck],
   ["/aulas", "Aulas", CalendarDays],
   ["/pagamentos", "Pagamentos", CreditCard],
