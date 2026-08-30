@@ -1,5 +1,5 @@
 import { Activity, Bike, Droplets, Flame, RefreshCw, Ruler, Save, Scale, Target, Utensils } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { AppShell } from "../components/AppShell";
 import { fetchOwnHealthDashboard, saveOwnMeasurement, type HealthDashboard } from "../services/healthService";
 
@@ -103,13 +103,8 @@ export function HealthScreen() {
         {loading && <section className="section-card health-state"><RefreshCw className="spin"/><h3>Carregando seu plano...</h3></section>}
         {!loading && error && <section className="section-card health-state health-state--error"><Activity/><h3>Não foi possível carregar</h3><p>{error}</p><button className="outline-button" onClick={() => void load()}>Tentar novamente</button></section>}
 
-        {!loading && !error && tab === "nutrition" && (
-          <NutritionPanel dashboard={dashboard} />
-        )}
-
-        {!loading && !error && tab === "cardio" && (
-          <CardioPanel dashboard={dashboard} />
-        )}
+        {!loading && !error && tab === "nutrition" && <NutritionPanel dashboard={dashboard} />}
+        {!loading && !error && tab === "cardio" && <CardioPanel dashboard={dashboard} />}
 
         {!loading && !error && tab === "progress" && (
           <section className="health-stack">
@@ -193,7 +188,7 @@ function CardioPanel({ dashboard }: { dashboard: HealthDashboard | null }) {
   </section>;
 }
 
-function Metric({ icon, label, value, delta, unit }: { icon: React.ReactNode; label: string; value: string; delta?: number | null; unit?: string }) {
+function Metric({ icon, label, value, delta, unit }: { icon: ReactNode; label: string; value: string; delta?: number | null; unit?: string }) {
   return <article className="health-metric"><div>{icon}</div><small>{label}</small><b>{value}</b>{delta != null && Math.abs(delta) >= 0.01 && <span className={delta < 0 ? "is-down" : "is-up"}>{delta > 0 ? "+" : ""}{delta.toFixed(1)} {unit}</span>}</article>;
 }
 
