@@ -7,6 +7,7 @@ import { ActiveWorkoutScreen } from "./screens/ActiveWorkoutScreen";
 import { AdminScreen } from "./screens/AdminScreen";
 import { ClassesScreen } from "./screens/ClassesScreen";
 import { EvolutionScreen } from "./screens/EvolutionScreen";
+import { HealthScreen } from "./screens/HealthScreen";
 import { HomeScreen } from "./screens/HomeScreen";
 import { LoginScreen } from "./screens/LoginScreen";
 import { NotificationsScreen } from "./screens/NotificationsScreen";
@@ -29,6 +30,7 @@ export function App() {
       <Route path="/" element={<Private><HomeScreen /></Private>} />
       <Route path="/treinos" element={<Private><WorkoutsScreen /></Private>} />
       <Route path="/treinos/ativo" element={<Private><ActiveWorkoutScreen /></Private>} />
+      <Route path="/saude" element={<Private><HealthScreen /></Private>} />
       <Route path="/evolucao" element={<Private><EvolutionScreen /></Private>} />
       <Route path="/aulas" element={<Private><ClassesScreen /></Private>} />
       <Route path="/pagamentos" element={<Private><PaymentsScreen /></Private>} />
