@@ -10,6 +10,7 @@ import "./account.css";
 import "./turnstile.css";
 import "./trainer.css";
 import "./student-workouts.css";
+import "./health.css";
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
