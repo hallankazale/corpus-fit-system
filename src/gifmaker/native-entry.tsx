@@ -1,1 +1,1 @@
-export { GifMakerApp as default } from "./GifMakerApp";
+export { OriginalModeApp as default } from "./OriginalModeApp";
