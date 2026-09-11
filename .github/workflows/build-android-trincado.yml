@@ -62,3 +62,5 @@ jobs:
           name: projeto-trincado-apk
           path: Projeto-Trincado-0.3.0.apk
           retention-days: 14
+
+# build-trigger: connector-contents-api
