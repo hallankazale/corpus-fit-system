@@ -1,9 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { GifMakerApp } from "./gifmaker/GifMakerApp";
+import { OriginalModeApp } from "./gifmaker/OriginalModeApp";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <GifMakerApp />
+    <OriginalModeApp />
   </React.StrictMode>,
 );
