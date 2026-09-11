@@ -3,6 +3,13 @@ import { GIFEncoder, applyPalette, quantize } from "gifenc";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { Share } from "@capacitor/share";
 import { zipSync, strToU8 } from "fflate";
+import {
+  LOCAL_EXERCISES,
+  generateLocalExerciseFrames,
+  getExerciseTemplate,
+  type ExerciseKey,
+  type FrameCount,
+} from "./local-generator";
 import "./gif-maker.css";
 
 type Frame = { id: string; name: string; dataUrl: string };
@@ -124,13 +131,15 @@ export function GifMakerApp() {
   const [name, setName] = useState("Elevação de pernas");
   const [category, setCategory] = useState("core");
   const [frames, setFrames] = useState<Frame[]>([]);
+  const [localExercise, setLocalExercise] = useState<ExerciseKey>("leg-raise");
+  const [frameCount, setFrameCount] = useState<FrameCount>(6);
   const [delay, setDelay] = useState(650);
   const [endPause, setEndPause] = useState(300);
   const [size, setSize] = useState(512);
   const [previewIndex, setPreviewIndex] = useState(0);
   const [working, setWorking] = useState(false);
   const [saved, setSaved] = useState<SavedGif[]>([]);
-  const [message, setMessage] = useState("Importe uma colagem 2×2 ou quadros separados.");
+  const [message, setMessage] = useState("Escolha um exercício e toque em Gerar imagens automaticamente.");
   const collageInput = useRef<HTMLInputElement>(null);
   const framesInput = useRef<HTMLInputElement>(null);
 
@@ -149,6 +158,31 @@ export function GifMakerApp() {
     const timer = window.setTimeout(() => setPreviewIndex(i => (i + 1) % playback.length), delay + (isEnd ? endPause : 0));
     return () => clearTimeout(timer);
   }, [previewIndex, delay, endPause, playback, frames]);
+
+  async function generateSmartFrames() {
+    setWorking(true);
+    setMessage("Criando quadros no aparelho...");
+    try {
+      const template = getExerciseTemplate(localExercise);
+      const generated = await generateLocalExerciseFrames(localExercise, frameCount);
+      setName(template.name);
+      setCategory(template.category);
+      setFrames(generated);
+      setPreviewIndex(0);
+      setMessage(`${generated.length} quadros criados localmente para ${template.name}. Revise a prévia e gere o GIF.`);
+    } catch (error) {
+      setMessage(`Erro na geração local: ${error instanceof Error ? error.message : String(error)}`);
+    } finally {
+      setWorking(false);
+    }
+  }
+
+  function selectExercise(value: ExerciseKey) {
+    setLocalExercise(value);
+    const template = getExerciseTemplate(value);
+    setName(template.name);
+    setCategory(template.category);
+  }
 
   async function onCollage(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -193,7 +227,7 @@ export function GifMakerApp() {
 
   async function generate() {
     if (frames.length < 2) {
-      setMessage("Adicione pelo menos 2 quadros.");
+      setMessage("Adicione ou gere pelo menos 2 quadros.");
       return;
     }
     setWorking(true);
@@ -243,8 +277,19 @@ export function GifMakerApp() {
   }
 
   return <div className="gm-app">
-    <header className="gm-header"><div><small>PROJETO TRINCADO</small><h1>GIF Maker</h1><p>Crie nossos exercícios no celular e exporte tudo organizado.</p></div><span>v0.2</span></header>
+    <header className="gm-header"><div><small>PROJETO TRINCADO</small><h1>GIF Maker AI Local</h1><p>Gere os quadros no próprio celular, transforme em GIF e exporte tudo organizado.</p></div><span>v0.3</span></header>
     <main>
+      <section className="gm-card gm-smart-card">
+        <div className="gm-smart-title"><div><small>INTELIGÊNCIA LOCAL</small><h2>1. Criar exercício automaticamente</h2></div><span>OFFLINE</span></div>
+        <p className="muted">O motor local usa poses paramétricas, interpolação de movimento e destaque automático do grupo muscular. Não precisa de internet nem de chave de API.</p>
+        <div className="gm-grid">
+          <label>Exercício<select value={localExercise} onChange={e => selectExercise(e.target.value as ExerciseKey)}>{LOCAL_EXERCISES.map(item => <option key={item.key} value={item.key}>{item.name}</option>)}</select></label>
+          <label>Quantidade de quadros<select value={frameCount} onChange={e => setFrameCount(Number(e.target.value) as FrameCount)}><option value="4">4 quadros • leve</option><option value="6">6 quadros • recomendado</option><option value="8">8 quadros • mais suave</option></select></label>
+        </div>
+        <div className="gm-smart-features"><span>✓ corpo anatômico clean</span><span>✓ músculo em vermelho</span><span>✓ movimento interpolado</span><span>✓ funciona offline</span></div>
+        <button className="smart-primary" disabled={working} onClick={generateSmartFrames}>{working ? "Criando..." : "✨ Gerar imagens automaticamente"}</button>
+      </section>
+
       <section className="gm-card gm-form">
         <label>Nome do exercício<input value={name} onChange={e => setName(e.target.value)} placeholder="Ex.: Elevação de pernas" /></label>
         <label>Categoria<select value={category} onChange={e => setCategory(e.target.value)}>{CATEGORIES.map(([v, l]) => <option value={v} key={v}>{l}</option>)}</select></label>
@@ -252,7 +297,7 @@ export function GifMakerApp() {
       </section>
 
       <section className="gm-card">
-        <h2>1. Imagens</h2><p className="muted">Use a colagem 2×2 que criamos ou selecione quadros separados.</p>
+        <h2>2. Quadros</h2><p className="muted">Os quadros inteligentes aparecem aqui. Você também pode importar uma colagem 2×2 ou imagens próprias.</p>
         <div className="gm-actions"><button onClick={() => collageInput.current?.click()}>Importar colagem 2×2</button><button className="secondary" onClick={() => framesInput.current?.click()}>Importar quadros</button></div>
         <input ref={collageInput} hidden type="file" accept="image/*" onChange={onCollage} />
         <input ref={framesInput} hidden type="file" accept="image/*" multiple onChange={onFrames} />
@@ -260,7 +305,7 @@ export function GifMakerApp() {
       </section>
 
       <section className="gm-card">
-        <h2>2. Ajustes</h2>
+        <h2>3. Movimento e velocidade</h2>
         <div className="gm-grid">
           <label>Velocidade<select value={delay} onChange={e => setDelay(Number(e.target.value))}><option value="1000">Muito lenta</option><option value="700">Lenta</option><option value="450">Média</option><option value="250">Rápida</option></select></label>
           <label>Resolução<select value={size} onChange={e => setSize(Number(e.target.value))}><option value="384">384×384 leve</option><option value="512">512×512 recomendada</option><option value="640">640×640 alta</option></select></label>
@@ -268,11 +313,11 @@ export function GifMakerApp() {
         <label style={{ marginTop: 12 }}>Ajuste fino: {delay} ms por quadro<input type="range" min="150" max="1200" step="50" value={delay} onChange={e => setDelay(Number(e.target.value))} /></label>
         <label style={{ marginTop: 12 }}>Pausa no início e no topo: {endPause} ms<input type="range" min="0" max="1000" step="50" value={endPause} onChange={e => setEndPause(Number(e.target.value))} /></label>
         <div className="gm-path" style={{ marginTop: 12 }}>Duração aproximada de um ciclo: <b>{(cycleMs / 1000).toFixed(1)} segundos</b></div>
-        <div className="gm-preview">{playback.length ? <img src={playback[previewIndex % playback.length]?.dataUrl} /> : <div>Prévia aparecerá aqui</div>}</div>
-        <small className="muted">A prévia usa exatamente o tempo que será gravado no GIF. O loop faz ida e volta automaticamente.</small>
+        <div className="gm-preview">{playback.length ? <img src={playback[previewIndex % playback.length]?.dataUrl} /> : <div>Gere um exercício para ver a prévia</div>}</div>
+        <small className="muted">A prévia usa o mesmo tempo gravado no GIF e faz ida e volta automaticamente.</small>
       </section>
 
-      <section className="gm-card"><h2>3. Gerar</h2><button className="primary" disabled={working || frames.length < 2} onClick={generate}>{working ? "Processando..." : "Gerar GIF e compartilhar"}</button><p className="gm-message">{message}</p></section>
+      <section className="gm-card"><h2>4. Gerar GIF</h2><button className="primary" disabled={working || frames.length < 2} onClick={generate}>{working ? "Processando..." : "Gerar GIF e compartilhar"}</button><p className="gm-message">{message}</p></section>
 
       <section className="gm-card">
         <div className="gm-library-title"><div><h2>Biblioteca</h2><p className="muted">Fica guardada neste aparelho até você apagar os dados do app.</p></div><b>{saved.length}</b></div>
@@ -280,6 +325,6 @@ export function GifMakerApp() {
         <button className="zip" disabled={!saved.length || working} onClick={exportZip}>Exportar ZIP organizado</button>
       </section>
     </main>
-    <footer>Quando terminar vários exercícios, envie o arquivo <b>projeto-trincado-gifs.zip</b> no ChatGPT.</footer>
+    <footer>Gerador local v0.3: seis exercícios base sem internet. Depois podemos adicionar um modo IA online para criar exercícios fora do catálogo.</footer>
   </div>;
 }
