@@ -13,6 +13,7 @@ import "./turnstile.css";
 import "./trainer.css";
 import "./student-workouts.css";
 import "./health.css";
+import "./trincado/anatomical.css";
 
 const isNativeApp = Capacitor.isNativePlatform();
 
