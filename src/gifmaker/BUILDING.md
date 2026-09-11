@@ -1,0 +1,1 @@
+Build via GitHub Actions workflow `build-gif-maker-apk.yml`.
