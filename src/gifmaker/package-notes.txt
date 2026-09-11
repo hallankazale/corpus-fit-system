@@ -1,0 +1,1 @@
+Dependencies required by this branch: gifenc, fflate, @capacitor/filesystem, @capacitor/share. They are added to package.json in this branch.
