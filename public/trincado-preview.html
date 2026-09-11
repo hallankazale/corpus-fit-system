@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0f14" />
+  <title>Projeto Trincado — Preview</title>
+  <style>
+    :root{color-scheme:dark;--bg:#070b10;--card:#10161d;--card2:#151c24;--text:#f5f7fa;--muted:#9aa7b4;--accent:#ff5b2e;--line:#232c36;--ok:#41c98e}
+    *{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#090d12 0%,#05080c 100%);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--text)}
+    .app{max-width:760px;margin:0 auto;min-height:100vh;padding:18px 14px 40px}.hero{padding:18px 4px 8px}.eyebrow{display:flex;align-items:center;gap:8px;font-weight:800;letter-spacing:.08em;font-size:12px;color:#ff8a67}.eyebrow i{width:8px;height:8px;background:var(--accent);border-radius:50%;box-shadow:0 0 16px #ff5b2e}.hero h1{font-size:28px;line-height:1.05;margin:10px 0 8px}.hero p{margin:0;color:var(--muted);font-size:14px;line-height:1.5}
+    .notice{margin:14px 0;background:#0f171f;border:1px solid #21303d;border-radius:15px;padding:12px 14px;font-size:13px;color:#c9d4de;display:flex;gap:10px;align-items:flex-start}.notice b{color:white}.toolbar{display:flex;gap:8px;overflow:auto;padding:8px 0 14px;scrollbar-width:none}.toolbar::-webkit-scrollbar{display:none}.filter{border:1px solid var(--line);background:#10161d;color:#c7d0da;border-radius:999px;padding:9px 13px;white-space:nowrap;font-weight:700;font-size:12px}.filter.active{background:var(--accent);border-color:var(--accent);color:white}
+    .count{display:flex;justify-content:space-between;align-items:center;margin:2px 2px 10px;color:var(--muted);font-size:12px}.grid{display:grid;grid-template-columns:1fr;gap:14px}@media(min-width:620px){.grid{grid-template-columns:1fr 1fr}}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.18)}.media{position:relative;aspect-ratio:1/1;background:#f4f4f4;display:flex;align-items:center;justify-content:center;overflow:hidden}.media img{width:100%;height:100%;object-fit:contain}.chip{position:absolute;left:10px;bottom:10px;background:rgba(7,11,16,.86);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:7px 10px;font-size:11px;font-weight:800}.body{padding:14px}.body small{display:block;color:#7f8c98;font-size:10px;font-weight:800;letter-spacing:.09em}.body h2{margin:3px 0 10px;font-size:19px}.meta{display:grid;grid-template-columns:1fr 1fr;gap:8px}.meta div{background:var(--card2);border:1px solid #202a34;border-radius:12px;padding:9px}.meta span{display:block;color:#8896a3;font-size:10px;margin-bottom:2px}.meta b{font-size:12px}.cue{margin:10px 0 0;color:#b6c1cb;font-size:12px;line-height:1.45}.open{width:100%;margin-top:12px;border:0;border-radius:12px;background:#202832;color:white;padding:11px 12px;font-weight:800}.open:active{transform:scale(.99)}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:flex-end;justify-content:center;padding:0;z-index:20}.modal.show{display:flex}.sheet{background:#0d131a;border:1px solid #26313b;border-bottom:0;width:min(760px,100%);max-height:92vh;overflow:auto;border-radius:24px 24px 0 0;padding:14px 14px 30px}.handle{width:42px;height:4px;border-radius:5px;background:#394550;margin:0 auto 12px}.sheet img{width:100%;aspect-ratio:1/1;object-fit:contain;background:#f3f3f3;border-radius:18px}.sheet h3{font-size:25px;margin:14px 0 4px}.sheet .muscle{color:#ff8a67;font-weight:800}.sheet .details{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}.sheet .details div{background:#141b22;border:1px solid #242e38;border-radius:13px;padding:11px}.sheet .details span{display:block;color:#84919e;font-size:10px}.sheet .details b{font-size:13px}.close{position:sticky;bottom:12px;width:100%;margin-top:18px;border:0;border-radius:14px;padding:13px;background:var(--accent);color:white;font-weight:900}.error{display:flex;align-items:center;justify-content:center;padding:20px;text-align:center;color:#505a63;font-size:12px}.footer{text-align:center;color:#66727e;font-size:11px;padding:28px 0 0}
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="hero">
+      <div class="eyebrow"><i></i> PROJETO TRINCADO • PREVIEW WEB</div>
+      <h1>Biblioteca de exercícios</h1>
+      <p>Toque em um exercício para conferir GIF, aparelho, séries, repetições, velocidade e técnica.</p>
+    </header>
+    <div class="notice"><span>🧪</span><div><b>Versão de teste no navegador.</b><br>Serve para aprovar o visual antes de gerar o próximo APK.</div></div>
+    <nav class="toolbar" id="filters"></nav>
+    <div class="count"><span id="count"></span><span>GIFs carregados online</span></div>
+    <section class="grid" id="grid"></section>
+    <footer class="footer">Corpus Fit • Projeto Trincado • Preview</footer>
+  </main>
+
+  <div class="modal" id="modal" role="dialog" aria-modal="true">
+    <div class="sheet" id="sheet"></div>
+  </div>
+
+<script>
+const CDN='https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/';
+const items=[
+ {id:'supino-reto',name:'Supino reto',muscle:'Peitoral',cat:'Peito',location:'Banco + barra',sets:4,reps:'8–12',speed:'Controlada',rest:'90 s',file:'pectorals/barbell-bench-press.gif',cue:'Escápulas apoiadas, pés firmes e descida controlada.'},
+ {id:'flexao',name:'Flexão',muscle:'Peitoral + tríceps',cat:'Peito',location:'Solo',sets:3,reps:'8–15',speed:'Média',rest:'60 s',file:'pectorals/push-up.gif',cue:'Mantenha o corpo alinhado e leve o peito entre as mãos.'},
+ {id:'crucifixo',name:'Crucifixo com halteres',muscle:'Peitoral',cat:'Peito',location:'Banco + halteres',sets:3,reps:'10–15',speed:'Lenta',rest:'60 s',file:'pectorals/dumbbell-fly.gif',cue:'Leve flexão nos cotovelos e amplitude confortável para os ombros.'},
+ {id:'triceps',name:'Tríceps corda',muscle:'Tríceps',cat:'Peito',location:'Polia alta',sets:3,reps:'10–15',speed:'Controlada',rest:'60 s',file:'triceps/cable-pushdown-with-rope-attachment.gif',cue:'Cotovelos junto ao tronco e abra a corda no final.'},
+ {id:'puxada',name:'Puxada alta',muscle:'Dorsais + bíceps',cat:'Costas',location:'Pulley',sets:4,reps:'8–12',speed:'Controlada',rest:'90 s',file:'lats/cable-lat-pulldown-full-range-of-motion.gif',cue:'Peito aberto e cotovelos descendo em direção ao tronco.'},
+ {id:'remada-baixa',name:'Remada baixa',muscle:'Costas',cat:'Costas',location:'Polia baixa',sets:4,reps:'8–12',speed:'Controlada',rest:'90 s',file:'upper-back/cable-seated-row.gif',cue:'Puxe com as costas sem balançar o tronco.'},
+ {id:'remada-curvada',name:'Remada curvada',muscle:'Costas + bíceps',cat:'Costas',location:'Barra',sets:3,reps:'8–12',speed:'Controlada',rest:'90 s',file:'upper-back/barbell-bent-over-row.gif',cue:'Mantenha a coluna neutra e puxe a barra ao abdômen.'},
+ {id:'rosca',name:'Rosca direta',muscle:'Bíceps',cat:'Costas',location:'Barra',sets:3,reps:'10–15',speed:'Lenta',rest:'60 s',file:'biceps/barbell-curl.gif',cue:'Cotovelos fixos e subida sem embalo.'},
+ {id:'agachamento',name:'Agachamento',muscle:'Quadríceps + glúteos',cat:'Pernas',location:'Rack + barra',sets:4,reps:'6–10',speed:'Controlada',rest:'120 s',file:'glutes/barbell-full-squat.gif',cue:'Joelhos acompanhando os pés e tronco firme.'},
+ {id:'legpress',name:'Leg press',muscle:'Quadríceps + glúteos',cat:'Pernas',location:'Máquina',sets:4,reps:'10–15',speed:'Controlada',rest:'90 s',file:'glutes/sled-45-leg-press.gif',cue:'Desça com controle sem perder o apoio do quadril.'},
+ {id:'romeno',name:'Levantamento romeno',muscle:'Posterior + glúteos',cat:'Pernas',location:'Barra',sets:4,reps:'8–12',speed:'Lenta',rest:'90 s',file:'glutes/barbell-romanian-deadlift.gif',cue:'Quadril para trás, coluna neutra e barra perto do corpo.'},
+ {id:'extensora',name:'Cadeira extensora',muscle:'Quadríceps',cat:'Pernas',location:'Máquina',sets:3,reps:'12–15',speed:'Lenta',rest:'60 s',file:'quads/lever-leg-extension.gif',cue:'Suba com controle e segure um instante no topo.'},
+ {id:'flexora',name:'Cadeira flexora',muscle:'Posterior de coxa',cat:'Pernas',location:'Máquina',sets:3,reps:'12–15',speed:'Lenta',rest:'60 s',file:'hamstrings/lever-seated-leg-curl.gif',cue:'Mantenha o quadril estabilizado e retorne sem soltar a carga.'},
+ {id:'panturrilha',name:'Panturrilha em pé',muscle:'Panturrilhas',cat:'Pernas',location:'Máquina/step',sets:4,reps:'12–20',speed:'Lenta',rest:'45 s',file:'calves/lever-standing-calf-raise.gif',cue:'Suba ao máximo e pause brevemente no topo.'},
+ {id:'desenvolvimento',name:'Desenvolvimento com halteres',muscle:'Deltoides',cat:'Ombros',location:'Halteres + banco',sets:4,reps:'8–12',speed:'Controlada',rest:'90 s',file:'delts/dumbbell-seated-shoulder-press.gif',cue:'Empurre sem arquear excessivamente a lombar.'},
+ {id:'lateral',name:'Elevação lateral',muscle:'Deltoide lateral',cat:'Ombros',location:'Halteres',sets:4,reps:'12–15',speed:'Lenta',rest:'60 s',file:'delts/dumbbell-lateral-raise.gif',cue:'Suba até a linha dos ombros sem balançar o tronco.'},
+ {id:'crunch',name:'Crunch',muscle:'Abdômen',cat:'Core',location:'Colchonete',sets:4,reps:'12–20',speed:'Lenta',rest:'45 s',file:'abs/crunch-floor.gif',cue:'Feche as costelas e evite puxar o pescoço.'},
+ {id:'elevacao-pernas',name:'Elevação de pernas',muscle:'Abdômen inferior',cat:'Core',location:'Solo/banco',sets:3,reps:'10–15',speed:'Lenta',rest:'45 s',file:'abs/lying-leg-raise-flat-bench.gif',cue:'Controle a lombar e evite impulso.'},
+ {id:'prancha',name:'Prancha',muscle:'Core',cat:'Core',location:'Solo',sets:3,reps:'40–60 s',speed:'Isométrica',rest:'45 s',file:'abs/weighted-front-plank.gif',cue:'Contraia abdômen e glúteos mantendo o corpo alinhado.'},
+ {id:'mountain',name:'Mountain climber',muscle:'Core + cardio',cat:'Cardio',location:'Solo',sets:4,reps:'30–40 s',speed:'Rápida',rest:'40 s',file:'cardio/mountain-climber.gif',cue:'Quadril baixo e passadas rápidas sem perder o controle.'}
+];
+const filters=['Todos','Peito','Costas','Pernas','Ombros','Core','Cardio'];
+let active='Todos';
+const grid=document.querySelector('#grid'), count=document.querySelector('#count'), filterEl=document.querySelector('#filters'), modal=document.querySelector('#modal'), sheet=document.querySelector('#sheet');
+function imgTag(x){return `<img loading="lazy" src="${CDN+x.file}" alt="${x.name}" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'error',textContent:'GIF indisponível neste momento'}))">`}
+function drawFilters(){filterEl.innerHTML=filters.map(f=>`<button class="filter ${f===active?'active':''}" data-filter="${f}">${f}</button>`).join('');filterEl.querySelectorAll('button').forEach(b=>b.onclick=()=>{active=b.dataset.filter;drawFilters();draw();});}
+function draw(){const list=active==='Todos'?items:items.filter(x=>x.cat===active);count.textContent=`${list.length} exercício${list.length!==1?'s':''}`;grid.innerHTML=list.map(x=>`<article class="card"><div class="media">${imgTag(x)}<div class="chip">${x.muscle}</div></div><div class="body"><small>MOVIMENTO</small><h2>${x.name}</h2><div class="meta"><div><span>Aparelho/Local</span><b>${x.location}</b></div><div><span>Séries/Reps</span><b>${x.sets} × ${x.reps}</b></div><div><span>Velocidade</span><b>${x.speed}</b></div><div><span>Intervalo</span><b>${x.rest}</b></div></div><p class="cue">${x.cue}</p><button class="open" data-id="${x.id}">Abrir exercício</button></div></article>`).join('');grid.querySelectorAll('.open').forEach(b=>b.onclick=()=>openItem(b.dataset.id));}
+function openItem(id){const x=items.find(i=>i.id===id);sheet.innerHTML=`<div class="handle"></div>${imgTag(x)}<h3>${x.name}</h3><div class="muscle">${x.muscle}</div><div class="details"><div><span>Aparelho/Local</span><b>${x.location}</b></div><div><span>Séries/Repetições</span><b>${x.sets} × ${x.reps}</b></div><div><span>Velocidade</span><b>${x.speed}</b></div><div><span>Intervalo</span><b>${x.rest}</b></div></div><p class="cue" style="font-size:14px;margin-top:16px"><b style="color:white">Técnica:</b> ${x.cue}</p><button class="close" id="close">Fechar</button>`;modal.classList.add('show');document.body.style.overflow='hidden';document.querySelector('#close').onclick=closeModal;}
+function closeModal(){modal.classList.remove('show');document.body.style.overflow='';}
+modal.addEventListener('click',e=>{if(e.target===modal)closeModal();});
+drawFilters();draw();
+</script>
+</body>
+</html>
