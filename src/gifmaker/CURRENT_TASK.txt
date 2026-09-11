@@ -1,0 +1,1 @@
+Finalize package dependencies, Capacitor identity, entrypoint and CI build.
