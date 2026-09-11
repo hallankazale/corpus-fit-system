@@ -1,15 +1,15 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "com.ozorio.projetotrincado",
-  appName: "Projeto Trincado",
+  appId: "com.ozorio.trincadogifmaker",
+  appName: "Trincado GIF Maker",
   webDir: "dist",
   server: {
     androidScheme: "https",
   },
   android: {
     allowMixedContent: false,
-    backgroundColor: "#0b0f14",
+    backgroundColor: "#080b10",
   },
 };
 
