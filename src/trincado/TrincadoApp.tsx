@@ -34,6 +34,15 @@ function loadProgress(): CompletionMap {
   }
 }
 
+function DetailField({ label, value, strong = false }: { label: string; value: string; strong?: boolean }) {
+  return (
+    <div className="tr-detail-field">
+      <span>{label}</span>
+      <b className={strong ? "is-strong" : ""}>{value}</b>
+    </div>
+  );
+}
+
 function ExerciseCard({
   exercise,
   day,
@@ -53,41 +62,52 @@ function ExerciseCard({
   return (
     <article className="tr-exercise-card">
       <div className="tr-media-wrap">
-        <img src={`./gifs/${exercise.gif}`} alt={`Execução de ${exercise.name}`} loading="lazy" />
-        <span>{exercise.muscle}</span>
+        <img src={`./gifs/${exercise.gif}`} alt={`Demonstração anatômica de ${exercise.name}`} loading="lazy" />
+        <span className="tr-muscle-chip"><i /> {exercise.muscle}</span>
       </div>
 
       <div className="tr-exercise-body">
         <div className="tr-exercise-title">
           <div>
-            <small>EXERCÍCIO</small>
+            <small>MOVIMENTO</small>
             <h3>{exercise.name}</h3>
           </div>
           <strong>{completed}/{exercise.sets}</strong>
         </div>
 
-        <div className="tr-metrics">
-          <div><b>{exercise.sets}</b><span>séries</span></div>
-          <div><b>{exercise.reps}</b><span>reps/tempo</span></div>
-          <div><b>{exercise.rest ? `${exercise.rest}s` : "—"}</b><span>descanso</span></div>
+        <div className="tr-detail-primary">
+          <DetailField label="Aparelho/Local" value={exercise.location} strong />
         </div>
 
-        <div className="tr-set-row" aria-label={`Séries de ${exercise.name}`}>
-          {Array.from({ length: exercise.sets }, (_, index) => {
-            const key = progressKey(day, exercise.id, index);
-            const checked = Boolean(progress[key]);
-            return (
-              <button
-                key={key}
-                type="button"
-                className={checked ? "is-done" : ""}
-                onClick={() => onToggleSet(exercise, index)}
-                aria-pressed={checked}
-              >
-                {checked ? <Check size={18} /> : index + 1}
-              </button>
-            );
-          })}
+        <div className="tr-detail-grid">
+          <DetailField label="Séries/Repetições" value={`${exercise.sets} × ${exercise.reps}`} strong />
+          <DetailField label="Velocidade" value={exercise.speed} />
+          <DetailField label="Músculo alvo" value={exercise.muscle} />
+          <DetailField label="Intervalo" value={exercise.rest ? `${exercise.rest} segundos` : "Sem intervalo"} />
+        </div>
+
+        <div className="tr-set-section">
+          <div className="tr-set-heading">
+            <span>Séries concluídas</span>
+            <small>toque para marcar</small>
+          </div>
+          <div className="tr-set-row" aria-label={`Séries de ${exercise.name}`}>
+            {Array.from({ length: exercise.sets }, (_, index) => {
+              const key = progressKey(day, exercise.id, index);
+              const checked = Boolean(progress[key]);
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  className={checked ? "is-done" : ""}
+                  onClick={() => onToggleSet(exercise, index)}
+                  aria-pressed={checked}
+                >
+                  {checked ? <Check size={18} /> : index + 1}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <button type="button" className="tr-technique" onClick={() => setExpanded((value) => !value)}>
@@ -264,7 +284,7 @@ export function TrincadoApp() {
 
       <footer className="tr-footer">
         <span>Corpus Fit • Projeto Trincado</span>
-        <small>Dados do treino ficam salvos localmente no aparelho.</small>
+        <small>GIFs anatômicos e dados do treino ficam disponíveis offline.</small>
       </footer>
     </div>
   );
