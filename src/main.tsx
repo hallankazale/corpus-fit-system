@@ -16,8 +16,10 @@ import "./health.css";
 import "./trincado/anatomical.css";
 
 const isNativeApp = Capacitor.isNativePlatform();
+const isTrincadoBrowserPreview =
+  new URLSearchParams(window.location.search).get("trincado") === "1";
 
-if (!isNativeApp && "serviceWorker" in navigator) {
+if (!isNativeApp && !isTrincadoBrowserPreview && "serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("./sw.js", { updateViaCache: "none" })
       .then((registration) => registration.update())
@@ -34,7 +36,7 @@ if (!isNativeApp && "serviceWorker" in navigator) {
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    {isNativeApp ? (
+    {isNativeApp || isTrincadoBrowserPreview ? (
       <TrincadoApp />
     ) : (
       <HashRouter>
