@@ -132,14 +132,14 @@ export function GifMakerApp() {
   const [category, setCategory] = useState("core");
   const [frames, setFrames] = useState<Frame[]>([]);
   const [localExercise, setLocalExercise] = useState<ExerciseKey>("leg-raise");
-  const [frameCount, setFrameCount] = useState<FrameCount>(6);
+  const [frameCount, setFrameCount] = useState<FrameCount>(8);
   const [delay, setDelay] = useState(650);
   const [endPause, setEndPause] = useState(300);
   const [size, setSize] = useState(512);
   const [previewIndex, setPreviewIndex] = useState(0);
   const [working, setWorking] = useState(false);
   const [saved, setSaved] = useState<SavedGif[]>([]);
-  const [message, setMessage] = useState("Escolha um exercício e toque em Gerar imagens automaticamente.");
+  const [message, setMessage] = useState("Escolha um exercício e toque em Gerar imagens Studio.");
   const collageInput = useRef<HTMLInputElement>(null);
   const framesInput = useRef<HTMLInputElement>(null);
 
@@ -161,7 +161,7 @@ export function GifMakerApp() {
 
   async function generateSmartFrames() {
     setWorking(true);
-    setMessage("Criando quadros no aparelho...");
+    setMessage("Renderizando imagens Studio no aparelho...");
     try {
       const template = getExerciseTemplate(localExercise);
       const generated = await generateLocalExerciseFrames(localExercise, frameCount);
@@ -169,7 +169,7 @@ export function GifMakerApp() {
       setCategory(template.category);
       setFrames(generated);
       setPreviewIndex(0);
-      setMessage(`${generated.length} quadros criados localmente para ${template.name}. Revise a prévia e gere o GIF.`);
+      setMessage(`${generated.length} quadros Studio criados para ${template.name}. Confira a prévia e gere o GIF.`);
     } catch (error) {
       setMessage(`Erro na geração local: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
@@ -277,17 +277,17 @@ export function GifMakerApp() {
   }
 
   return <div className="gm-app">
-    <header className="gm-header"><div><small>PROJETO TRINCADO</small><h1>GIF Maker AI Local</h1><p>Gere os quadros no próprio celular, transforme em GIF e exporte tudo organizado.</p></div><span>v0.3</span></header>
+    <header className="gm-header"><div><small>PROJETO TRINCADO</small><h1>GIF Maker Studio Local</h1><p>Gere quadros anatômicos no celular, anime, salve e exporte tudo organizado.</p></div><span>v0.4</span></header>
     <main>
       <section className="gm-card gm-smart-card">
-        <div className="gm-smart-title"><div><small>INTELIGÊNCIA LOCAL</small><h2>1. Criar exercício automaticamente</h2></div><span>OFFLINE</span></div>
-        <p className="muted">O motor local usa poses paramétricas, interpolação de movimento e destaque automático do grupo muscular. Não precisa de internet nem de chave de API.</p>
+        <div className="gm-smart-title"><div><small>RENDER STUDIO LOCAL</small><h2>1. Criar exercício automaticamente</h2></div><span>OFFLINE</span></div>
+        <p className="muted">O novo motor v0.4 usa corpo vetorial em camadas, volume, luz e sombra, equipamento refinado, movimento interpolado e musculatura destacada em vermelho. Tudo é renderizado no próprio celular.</p>
         <div className="gm-grid">
           <label>Exercício<select value={localExercise} onChange={e => selectExercise(e.target.value as ExerciseKey)}>{LOCAL_EXERCISES.map(item => <option key={item.key} value={item.key}>{item.name}</option>)}</select></label>
-          <label>Quantidade de quadros<select value={frameCount} onChange={e => setFrameCount(Number(e.target.value) as FrameCount)}><option value="4">4 quadros • leve</option><option value="6">6 quadros • recomendado</option><option value="8">8 quadros • mais suave</option></select></label>
+          <label>Quantidade de quadros<select value={frameCount} onChange={e => setFrameCount(Number(e.target.value) as FrameCount)}><option value="4">4 quadros • leve</option><option value="6">6 quadros • bom</option><option value="8">8 quadros • mais suave</option></select></label>
         </div>
-        <div className="gm-smart-features"><span>✓ corpo anatômico clean</span><span>✓ músculo em vermelho</span><span>✓ movimento interpolado</span><span>✓ funciona offline</span></div>
-        <button className="smart-primary" disabled={working} onClick={generateSmartFrames}>{working ? "Criando..." : "✨ Gerar imagens automaticamente"}</button>
+        <div className="gm-smart-features"><span>✓ corpo vetorial volumétrico</span><span>✓ músculo segmentado em vermelho</span><span>✓ banco e solo refinados</span><span>✓ 100% offline</span></div>
+        <button className="smart-primary" disabled={working} onClick={generateSmartFrames}>{working ? "Renderizando..." : "✨ Gerar imagens Studio"}</button>
       </section>
 
       <section className="gm-card gm-form">
@@ -297,7 +297,7 @@ export function GifMakerApp() {
       </section>
 
       <section className="gm-card">
-        <h2>2. Quadros</h2><p className="muted">Os quadros inteligentes aparecem aqui. Você também pode importar uma colagem 2×2 ou imagens próprias.</p>
+        <h2>2. Quadros</h2><p className="muted">Os quadros Studio aparecem aqui. Você também pode substituir por uma colagem 2×2 ou imagens próprias.</p>
         <div className="gm-actions"><button onClick={() => collageInput.current?.click()}>Importar colagem 2×2</button><button className="secondary" onClick={() => framesInput.current?.click()}>Importar quadros</button></div>
         <input ref={collageInput} hidden type="file" accept="image/*" onChange={onCollage} />
         <input ref={framesInput} hidden type="file" accept="image/*" multiple onChange={onFrames} />
@@ -325,6 +325,6 @@ export function GifMakerApp() {
         <button className="zip" disabled={!saved.length || working} onClick={exportZip}>Exportar ZIP organizado</button>
       </section>
     </main>
-    <footer>Gerador local v0.3: seis exercícios base sem internet. Depois podemos adicionar um modo IA online para criar exercícios fora do catálogo.</footer>
+    <footer>Studio local v0.4: seis exercícios base, geração offline, velocidade ajustável, biblioteca e exportação ZIP. Imagens próprias continuam compatíveis.</footer>
   </div>;
 }
