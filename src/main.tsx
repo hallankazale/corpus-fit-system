@@ -1,9 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { Capacitor } from "@capacitor/core";
 import { HashRouter } from "react-router-dom";
 import { App } from "./App";
 import { AppStateProvider } from "./state/AppState";
 import { AccountProvider } from "./state/AccountContext";
+import { TrincadoApp } from "./trincado/TrincadoApp";
 import "./styles.css";
 import "./phase2.css";
 import "./account.css";
@@ -12,7 +14,9 @@ import "./trainer.css";
 import "./student-workouts.css";
 import "./health.css";
 
-if ("serviceWorker" in navigator) {
+const isNativeApp = Capacitor.isNativePlatform();
+
+if (!isNativeApp && "serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("./sw.js", { updateViaCache: "none" })
       .then((registration) => registration.update())
@@ -29,12 +33,16 @@ if ("serviceWorker" in navigator) {
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <HashRouter>
-      <AppStateProvider>
-        <AccountProvider>
-          <App />
-        </AccountProvider>
-      </AppStateProvider>
-    </HashRouter>
+    {isNativeApp ? (
+      <TrincadoApp />
+    ) : (
+      <HashRouter>
+        <AppStateProvider>
+          <AccountProvider>
+            <App />
+          </AccountProvider>
+        </AppStateProvider>
+      </HashRouter>
+    )}
   </React.StrictMode>,
 );
