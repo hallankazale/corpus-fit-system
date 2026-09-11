@@ -1,0 +1,1 @@
+Create original exercise GIF assets from user-provided frames on Android.
