@@ -1,0 +1,1 @@
+Prototype utility for creating original Projeto Trincado exercise animations from user-provided or generated frames. No third-party exercise GIF library is bundled into this utility.
