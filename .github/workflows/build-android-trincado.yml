@@ -32,9 +32,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Generate anatomical offline workout GIFs
+      - name: Download professional workout GIFs
         run: |
-          python -m pip install --disable-pip-version-check pillow==11.3.0
           python scripts/run_anatomical_gifs.py
           test "$(find public/gifs -maxdepth 1 -name '*.gif' | wc -l)" -ge 19
 
@@ -50,16 +49,24 @@ jobs:
       - name: Sync web assets
         run: npx cap sync android
 
-      - name: Build debug APK
+      - name: Build debug APK with Gradle
         working-directory: android
         run: ./gradlew assembleDebug --stacktrace
 
+      - name: Verify APK structure and Android signature
+        run: |
+          APK="android/app/build/outputs/apk/debug/app-debug.apk"
+          BUILD_TOOLS_DIR="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
+          "$BUILD_TOOLS_DIR/apksigner" verify --verbose --print-certs "$APK"
+          "$BUILD_TOOLS_DIR/aapt" dump badging "$APK" | grep "package: name='com.ozorio.projetotrincado'"
+          unzip -t "$APK" >/dev/null
+
       - name: Rename APK
-        run: cp android/app/build/outputs/apk/debug/app-debug.apk Projeto-Trincado-0.4.0.apk
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk Projeto-Trincado-0.5.2.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: projeto-trincado-anatomico-apk
-          path: Projeto-Trincado-0.4.0.apk
+          name: projeto-trincado-0.5.2-apk
+          path: Projeto-Trincado-0.5.2.apk
           retention-days: 14

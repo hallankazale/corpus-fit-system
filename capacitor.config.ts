@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "com.ozorio.corpusfit",
+  appId: "com.ozorio.projetotrincado",
   appName: "Projeto Trincado",
   webDir: "dist",
   server: {

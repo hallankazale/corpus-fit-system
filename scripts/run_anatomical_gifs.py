@@ -1,24 +1,52 @@
-"""Run the anatomical GIF generator with safe RGBA compositing.
+"""Download the professional exercise GIF set used by Projeto Trincado.
 
-Pillow's ImageDraw.bitmap expects a 1-bit bitmap in some versions. The anatomical
-renderer uses transparent RGBA overlays so muscle highlights can be rotated.
-This shim composites those overlays onto the target image and delegates every
-other bitmap call to Pillow unchanged.
+The files are pinned to ExerciseGymGifsDB v1.1.0 so builds are reproducible.
+This is for prototype/testing distribution; third-party media licensing must be
+reviewed before a commercial/Play Store release.
 """
 from pathlib import Path
-import runpy
-from PIL import ImageDraw
+from urllib.request import Request, urlopen
 
-_original_bitmap = ImageDraw.ImageDraw.bitmap
+BASE = "https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0"
+OUT = Path("public/gifs")
+OUT.mkdir(parents=True, exist_ok=True)
 
+GIFS = {
+    "supino-reto.gif": "pectorals/barbell-bench-press.gif",
+    "flexao.gif": "pectorals/push-up.gif",
+    "triceps-corda.gif": "triceps/cable-pushdown-with-rope-attachment.gif",
+    "crunch.gif": "abs/crunch-floor.gif",
+    "prancha.gif": "abs/weighted-front-plank.gif",
+    "puxada-alta.gif": "lats/cable-lat-pulldown-full-range-of-motion.gif",
+    "remada-baixa.gif": "upper-back/cable-seated-row.gif",
+    "rosca-direta.gif": "biceps/barbell-curl.gif",
+    "caminhada-inclinada.gif": "cardio/walking-on-incline-treadmill.gif",
+    "agachamento.gif": "glutes/barbell-full-squat.gif",
+    "leg-press.gif": "glutes/sled-45-leg-press.gif",
+    "romeno.gif": "glutes/barbell-romanian-deadlift.gif",
+    "panturrilha.gif": "calves/lever-standing-calf-raise.gif",
+    "desenvolvimento.gif": "delts/dumbbell-seated-shoulder-press.gif",
+    "elevacao-lateral.gif": "delts/dumbbell-lateral-raise.gif",
+    "elevacao-pernas.gif": "abs/lying-leg-raise-flat-bench.gif",
+    "bicicleta.gif": "cardio/stationary-bike-walk.gif",
+    "agachamento-goblet.gif": "quads/dumbbell-goblet-squat.gif",
+    "mountain-climber.gif": "cardio/mountain-climber.gif",
+}
 
-def _safe_bitmap(self, xy, bitmap, fill=None):
-    if getattr(bitmap, "mode", None) == "RGBA":
-        x, y = int(xy[0]), int(xy[1])
-        self._image.paste(bitmap, (x, y), bitmap)
-        return None
-    return _original_bitmap(self, xy, bitmap, fill=fill)
+for target_name, upstream_path in GIFS.items():
+    url = f"{BASE}/{upstream_path}"
+    request = Request(url, headers={"User-Agent": "Projeto-Trincado-Build/0.5.2"})
+    with urlopen(request, timeout=45) as response:
+        payload = response.read()
+    if not payload.startswith((b"GIF87a", b"GIF89a")):
+        raise RuntimeError(f"Arquivo inválido para {target_name}: {url}")
+    if len(payload) < 10_000:
+        raise RuntimeError(f"GIF muito pequeno para {target_name}: {len(payload)} bytes")
+    (OUT / target_name).write_bytes(payload)
+    print(f"OK {target_name}: {len(payload)} bytes")
 
+missing = [name for name in GIFS if not (OUT / name).exists()]
+if missing:
+    raise RuntimeError(f"GIFs ausentes: {missing}")
 
-ImageDraw.ImageDraw.bitmap = _safe_bitmap
-runpy.run_path(str(Path(__file__).with_name("generate_workout_gifs.py")), run_name="__main__")
+print(f"{len(GIFS)} GIFs profissionais preparados em {OUT}")

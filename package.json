@@ -1,7 +1,7 @@
 {
   "name": "corpus-fit-system",
   "private": true,
-  "version": "0.3.0",
+  "version": "0.5.2",
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
