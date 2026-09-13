@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from urllib.request import Request, urlopen
 import cairosvg
-from PIL import Image
+from PIL import Image, ImageChops
 
 MANIFEST = "https://raw.githubusercontent.com/bryllim/workout-guide/main/packages/workout-guide/manifest.json"
 BASE = "https://raw.githubusercontent.com/bryllim/workout-guide/main/packages/workout-guide"
@@ -32,10 +32,12 @@ TARGETS = {
     "mountain-climber.gif": ["Mountain Climber"],
 }
 
+
 def read(url):
-    req = Request(url, headers={"User-Agent": "Projeto-Trincado/0.5.4"})
+    req = Request(url, headers={"User-Agent": "Projeto-Trincado/0.5.5"})
     with urlopen(req, timeout=45) as response:
         return response.read()
+
 
 def pick(items, names):
     exact = {x["name"].casefold(): x for x in items}
@@ -49,12 +51,32 @@ def pick(items, names):
                 return item
     raise RuntimeError(str(names))
 
-def raster(svg):
-    png = cairosvg.svg2png(bytestring=svg, output_width=512, output_height=512)
+
+def raster(svg_bytes):
+    # Workout Guide's vectors are intentionally white for dark UIs.
+    # Our exercise cards are white, so recolor the monochrome vector before rasterizing.
+    svg_text = svg_bytes.decode("utf-8")
+    svg_text = svg_text.replace('fill="#fff"', 'fill="#4d5660"')
+    svg_text = svg_text.replace('fill="#ffffff"', 'fill="#4d5660"')
+    svg_text = svg_text.replace('fill="white"', 'fill="#4d5660"')
+    png = cairosvg.svg2png(bytestring=svg_text.encode("utf-8"), output_width=512, output_height=512)
     image = Image.open(io.BytesIO(png)).convert("RGBA")
     bg = Image.new("RGBA", (512, 512), "white")
     bg.alpha_composite(image)
-    return bg.convert("P", palette=Image.Palette.ADAPTIVE, colors=256)
+    rgb = bg.convert("RGB")
+
+    # Fail the build instead of shipping another invisible animation.
+    white = Image.new("RGB", rgb.size, "white")
+    diff = ImageChops.difference(rgb, white).convert("L")
+    if diff.getbbox() is None:
+        raise RuntimeError("Frame rasterizado ficou totalmente branco")
+    histogram = diff.histogram()
+    nonwhite = sum(histogram[8:])
+    if nonwhite < 2500:
+        raise RuntimeError(f"Frame quase vazio: {nonwhite} pixels úteis")
+
+    return rgb.convert("P", palette=Image.Palette.ADAPTIVE, colors=256)
+
 
 items = json.loads(read(MANIFEST).decode())
 credits = {}
@@ -68,15 +90,33 @@ for filename, names in TARGETS.items():
     else:
         seq = [frames[0], frames[1], frames[2], frames[1]]
     durations = [600, 420, 600, 420][:len(seq)]
-    seq[0].save(OUT / filename, save_all=True, append_images=seq[1:], duration=durations, loop=0, optimize=True, disposal=2)
-    credits[filename] = {"name": ex["name"], "slug": ex["slug"], "license": "CC BY-SA 4.0"}
+    seq[0].save(
+        OUT / filename,
+        save_all=True,
+        append_images=seq[1:],
+        duration=durations,
+        loop=0,
+        optimize=True,
+        disposal=2,
+    )
+    credits[filename] = {
+        "name": ex["name"],
+        "slug": ex["slug"],
+        "license": "CC BY-SA 4.0",
+    }
     print("OK", filename, ex["name"])
 
-(OUT / "ATTRIBUTION.json").write_text(json.dumps({
-    "source": "Workout Guide by Bryl Lim",
-    "sourceUrl": "https://github.com/bryllim/workout-guide",
-    "license": "CC BY-SA 4.0",
-    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
-    "changes": "Frames converted from SVG to 512px looping GIFs.",
-    "assets": credits
-}, indent=2), encoding="utf-8")
+(OUT / "ATTRIBUTION.json").write_text(
+    json.dumps(
+        {
+            "source": "Workout Guide by Bryl Lim",
+            "sourceUrl": "https://github.com/bryllim/workout-guide",
+            "license": "CC BY-SA 4.0",
+            "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+            "changes": "Frames recolored for white-card display and converted from SVG to 512px looping GIFs.",
+            "assets": credits,
+        },
+        indent=2,
+    ),
+    encoding="utf-8",
+)
