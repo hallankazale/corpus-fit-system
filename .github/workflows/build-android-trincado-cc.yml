@@ -1,0 +1,44 @@
+name: Build Android APK - Projeto Trincado CC
+
+on:
+  push:
+    branches:
+      - feature/projeto-trincado-android
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - run: npm install
+      - run: python -m pip install cairosvg pillow
+      - run: python scripts/run_cc_exercise_gifs.py
+      - run: npm test
+      - run: npm run build
+      - run: npx cap add android
+      - run: npx cap sync android
+      - working-directory: android
+        run: ./gradlew assembleDebug --stacktrace
+      - run: |
+          APK="android/app/build/outputs/apk/debug/app-debug.apk"
+          BUILD_TOOLS_DIR="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
+          "$BUILD_TOOLS_DIR/apksigner" verify --verbose "$APK"
+          "$BUILD_TOOLS_DIR/aapt" dump badging "$APK" | grep "package: name='com.ozorio.projetotrincado'"
+          cp "$APK" Projeto-Trincado-0.5.4.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: projeto-trincado-0.5.4-apk
+          path: Projeto-Trincado-0.5.4.apk
+          retention-days: 14
