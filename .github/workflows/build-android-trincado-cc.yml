@@ -36,9 +36,9 @@ jobs:
           BUILD_TOOLS_DIR="$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)"
           "$BUILD_TOOLS_DIR/apksigner" verify --verbose "$APK"
           "$BUILD_TOOLS_DIR/aapt" dump badging "$APK" | grep "package: name='com.ozorio.projetotrincado'"
-          cp "$APK" Projeto-Trincado-0.5.4.apk
+          cp "$APK" Projeto-Trincado-0.5.5.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: projeto-trincado-0.5.4-apk
-          path: Projeto-Trincado-0.5.4.apk
+          name: projeto-trincado-0.5.5-apk
+          path: Projeto-Trincado-0.5.5.apk
           retention-days: 14
