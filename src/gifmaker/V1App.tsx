@@ -1,6 +1,7 @@
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import { CATEGORIES, buildGif, deleteGif, exportLibraryZip, fileToDataUrl, frameDuration, listSaved, playbackFor, saveGif, shareBytes, slugify, split2x2, type Frame, type LoopMode, type SavedGif, type Settings } from "./original-mode-core";
 import { centerFrames, guessFromFilename } from "./smart-tools";
+import { AiGeneratorPanel } from "./AiGeneratorPanel";
 import "./original-mode.css";
 
 export function V1App() {
@@ -15,7 +16,7 @@ export function V1App() {
   const [previewIndex, setPreviewIndex] = useState(0);
   const [working, setWorking] = useState(false);
   const [saved, setSaved] = useState<SavedGif[]>([]);
-  const [message, setMessage] = useState("Importe uma colagem 2×2 ou quadros separados para começar.");
+  const [message, setMessage] = useState("Escolha um exercício e toque em Gerar tudo com IA.");
   const collageInput = useRef<HTMLInputElement>(null);
   const framesInput = useRef<HTMLInputElement>(null);
   const slug = useMemo(() => slugify(name) || "exercicio", [name]);
@@ -45,9 +46,9 @@ export function V1App() {
     setWorking(true);
     try {
       const recognized = detect(file.name);
-      setFrames(await split2x2(await fileToDataUrl(file)));
+      setFrames(await centerFrames(await split2x2(await fileToDataUrl(file))));
       setPreviewIndex(0);
-      setMessage(recognized ? "Colagem recortada e exercício reconhecido automaticamente." : "Colagem recortada em 4 quadros. Ajuste o nome se necessário.");
+      setMessage(recognized ? "Colagem recortada, alinhada e exercício reconhecido automaticamente." : "Colagem recortada e alinhada. Ajuste o nome se necessário.");
     } catch (error) { setMessage(`Erro ao importar: ${error instanceof Error ? error.message : String(error)}`); }
     finally { setWorking(false); event.target.value = ""; }
   }
@@ -59,9 +60,9 @@ export function V1App() {
     try {
       detect(files[0].name);
       const next = await Promise.all(files.map(async (file, index) => ({ id: crypto.randomUUID(), name: `frame-${index + 1}`, dataUrl: await fileToDataUrl(file) })));
-      setFrames(next);
+      setFrames(await centerFrames(next));
       setPreviewIndex(0);
-      setMessage(`${next.length} quadros importados.`);
+      setMessage(`${next.length} quadros importados e alinhados.`);
     } catch (error) { setMessage(`Erro ao importar: ${error instanceof Error ? error.message : String(error)}`); }
     finally { setWorking(false); event.target.value = ""; }
   }
@@ -98,15 +99,16 @@ export function V1App() {
   }
 
   return <div className="v5-app">
-    <header className="v5-header"><div><small>PROJETO TRINCADO</small><h1>GIF Maker Studio</h1><p>Produza e organize os GIFs do nosso app de academia direto no celular.</p></div><span>v1.0</span></header>
+    <header className="v5-header"><div><small>PROJETO TRINCADO</small><h1>GIF Maker AI</h1><p>A IA cria as imagens; o app recorta, alinha e gera os GIFs no celular.</p></div><span>v1.1 AI</span></header>
     <main>
-      <section className="card hero"><div className="title-row"><div><small>PASSO 1</small><h2>Importar imagens</h2></div><span>PRODUÇÃO</span></div><p className="muted">Use nomes como <b>supino-reto-2x2.png</b> para o app preencher nome e categoria automaticamente.</p><div className="import-grid"><button className="import-main" onClick={() => collageInput.current?.click()}>▦ Colagem 2×2<small>Recorta 4 quadros sozinho</small></button><button className="import-alt" onClick={() => framesInput.current?.click()}>▣ Quadros separados<small>4, 6, 8 ou mais imagens</small></button></div><input ref={collageInput} hidden type="file" accept="image/*" onChange={importCollage}/><input ref={framesInput} hidden type="file" accept="image/*" multiple onChange={importSeparate}/></section>
+      <AiGeneratorPanel working={working} setWorking={setWorking} setFrames={(next) => { setFrames(next); setPreviewIndex(0); }} setName={setName} setCategory={setCategory} setMessage={setMessage}/>
+      <section className="card"><div className="title-row"><div><small>MODO MANUAL</small><h2>Importar imagens</h2></div><span>OPCIONAL</span></div><p className="muted">Se quiser, ainda dá para importar uma colagem 2×2 ou quadros separados.</p><div className="import-grid"><button className="import-main" onClick={() => collageInput.current?.click()}>▦ Colagem 2×2<small>Recorta 4 quadros sozinho</small></button><button className="import-alt" onClick={() => framesInput.current?.click()}>▣ Quadros separados<small>4, 6, 8 ou mais imagens</small></button></div><input ref={collageInput} hidden type="file" accept="image/*" onChange={importCollage}/><input ref={framesInput} hidden type="file" accept="image/*" multiple onChange={importSeparate}/></section>
       <section className="card form-grid"><label>Nome do exercício<input value={name} onChange={event => setName(event.target.value)}/></label><label>Categoria<select value={category} onChange={event => setCategory(event.target.value)}>{CATEGORIES.map(([value,label]) => <option value={value} key={value}>{label}</option>)}</select></label><div className="path">Destino: <b>{category}/{slug}/{slug}.gif</b></div></section>
-      <section className="card"><div className="section-head"><div><h2>2. Quadros</h2><p className="muted">Reordene e use o alinhamento automático se houver “pulos”.</p></div><div>{frames.length > 0 && <button className="clear" disabled={working} onClick={align}>◎ Alinhar</button>}</div></div>{frames.length === 0 ? <div className="empty">Nenhum quadro importado.</div> : <div className="frames">{frames.map((frame,index) => <article key={frame.id}><img src={frame.dataUrl} alt={`Quadro ${index + 1}`}/><strong>{index + 1}</strong><div className="frame-actions"><button disabled={index===0} onClick={() => move(index,-1)}>←</button><button disabled={index===frames.length-1} onClick={() => move(index,1)}>→</button><button onClick={() => duplicate(index)}>＋</button><button className="danger" onClick={() => remove(frame.id)}>×</button></div></article>)}</div>}</section>
+      <section className="card"><div className="section-head"><div><h2>2. Quadros</h2><p className="muted">A IA já tenta alinhar. Você ainda pode corrigir e reorganizar.</p></div><div>{frames.length > 0 && <button className="clear" disabled={working} onClick={align}>◎ Alinhar</button>}</div></div>{frames.length === 0 ? <div className="empty">Aguardando geração da IA ou importação.</div> : <div className="frames">{frames.map((frame,index) => <article key={frame.id}><img src={frame.dataUrl} alt={`Quadro ${index + 1}`}/><strong>{index + 1}</strong><div className="frame-actions"><button disabled={index===0} onClick={() => move(index,-1)}>←</button><button disabled={index===frames.length-1} onClick={() => move(index,1)}>→</button><button onClick={() => duplicate(index)}>＋</button><button className="danger" onClick={() => remove(frame.id)}>×</button></div></article>)}</div>}</section>
       <section className="card"><h2>3. Animação</h2><div className="two-col"><label>Loop<select value={loopMode} onChange={event => setLoopMode(event.target.value as LoopMode)}><option value="ping-pong">Ida e volta</option><option value="linear">Linear</option></select></label><label>Resolução<select value={size} onChange={event => setSize(Number(event.target.value))}><option value="384">384×384</option><option value="512">512×512</option><option value="640">640×640</option></select></label></div><label className="range">Tempo por quadro: <b>{delay} ms</b><input type="range" min="150" max="1200" step="50" value={delay} onChange={event => setDelay(Number(event.target.value))}/></label><div className="two-col"><label>Pausa inicial: <b>{startPause} ms</b><input type="range" min="0" max="1200" step="50" value={startPause} onChange={event => setStartPause(Number(event.target.value))}/></label><label>Pausa final: <b>{endPause} ms</b><input type="range" min="0" max="1200" step="50" value={endPause} onChange={event => setEndPause(Number(event.target.value))}/></label></div><div className="path">Ciclo aproximado: <b>{(cycleMs/1000).toFixed(1)} s</b> • {playback.length} passos</div><div className="preview">{playback.length ? <img src={playback[previewIndex % playback.length]?.dataUrl} alt="Prévia"/> : <div>Prévia aparecerá aqui</div>}</div></section>
       <section className="card"><h2>4. Gerar GIF</h2><button className="final-btn" disabled={working || frames.length < 2} onClick={generate}>{working ? "Processando..." : "Gerar GIF e compartilhar"}</button><p className="message">{message}</p></section>
       <section className="card"><div className="library-head"><div><h2>Biblioteca</h2><p className="muted">Tudo fica salvo localmente até você exportar.</p></div><b>{saved.length}</b></div>{saved.length === 0 ? <div className="empty">Nenhum GIF salvo.</div> : <div className="saved">{[...saved].sort((a,b) => b.createdAt.localeCompare(a.createdAt)).map(item => <article key={item.id}><div><strong>{item.name}</strong><small>{item.category}/{item.slug} • {item.frames?.length ?? "?"} quadros</small></div><div><button onClick={() => shareBytes(item.bytes, `${item.slug}.gif`)}>Compartilhar</button><button className="danger" onClick={async () => { await deleteGif(item.id); setSaved(await listSaved()); }}>Apagar</button></div></article>)}</div>}<button className="zip-btn" disabled={!saved.length || working} onClick={exportZip}>Exportar biblioteca em ZIP</button></section>
     </main>
-    <footer>Trincado GIF Maker v1.0 • GIFs, frames e metadados organizados para o repositório.</footer>
+    <footer>Trincado GIF Maker v1.1 AI Beta • geração automática conectada ao backend.</footer>
   </div>;
 }
