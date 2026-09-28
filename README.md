@@ -1,4 +1,4 @@
-# Corpus Fit System
+# Ozorio Fit
 
 Primeira implementação do aplicativo mobile da academia, baseada nos mockups 9:16 definidos no projeto.
 
