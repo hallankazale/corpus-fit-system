@@ -10,7 +10,7 @@ describe("Payment experience", () => {
     renderApp(<PaymentsScreen />, ["/pagamentos"]);
     await user.click(screen.getByRole("button", { name: "Pagar mensalidade" }));
     expect(await screen.findByRole("dialog", { name: "Pagamento via PIX" })).toBeInTheDocument();
-    expect(await screen.findByText(/00020126TESTE-CORPUS-FIT-PIX/i)).toBeInTheDocument();
+    expect(await screen.findByText(/00020126TESTE-OZORIO-FIT-PIX/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Copiar PIX" })).toBeInTheDocument();
   });
 });
