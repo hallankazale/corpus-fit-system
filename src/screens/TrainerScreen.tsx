@@ -20,7 +20,7 @@ import {
   type WorkoutStudent,
 } from "../services/workoutService";
 
-const codes: WorkoutProgram["code"][] = ["A", "B", "C"];
+const codes: WorkoutProgram["code"][] = ["A", "B", "C", "D", "E"];
 const emptyExercise = (): WorkoutExerciseDraft => ({
   name: "",
   muscle_group: "",
