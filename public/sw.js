@@ -1,4 +1,4 @@
-const CACHE = "corpus-fit-v3";
+const CACHE = "ozorio-fit-v1";
 const APP_SHELL = "./";
 
 self.addEventListener("install", (event) => {

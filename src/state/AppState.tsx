@@ -59,10 +59,10 @@ function usePersistentState<T>(key: string, fallback: T) {
 }
 
 export function AppStateProvider({ children }: { children: ReactNode }) {
-  const [classes, setClasses] = usePersistentState<ClassSession[]>("corpus:v1:classes", initialClasses);
-  const [notifications, setNotifications] = usePersistentState<AppNotification[]>("corpus:v1:notifications", initialNotifications);
-  const [profile, setProfile] = usePersistentState<ProfileSettings>("corpus:v1:profile", profileDefaults);
-  const [theme, setTheme] = usePersistentState<ThemeMode>("corpus:v1:theme", "light");
+  const [classes, setClasses] = usePersistentState<ClassSession[]>("ozorio-fit:v1:classes", initialClasses);
+  const [notifications, setNotifications] = usePersistentState<AppNotification[]>("ozorio-fit:v1:notifications", initialNotifications);
+  const [profile, setProfile] = usePersistentState<ProfileSettings>("ozorio-fit:v1:profile", profileDefaults);
+  const [theme, setTheme] = usePersistentState<ThemeMode>("ozorio-fit:v1:theme", "light");
   const [selectedPublicProfile, setSelectedPublicProfile] = useState<PublicProfile | null>(null);
 
   useEffect(() => {

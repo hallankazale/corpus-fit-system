@@ -242,7 +242,7 @@ export async function createPixCharge(): Promise<PixCharge> {
       providerPaymentId: "123456",
       amountCents: 9990,
       status: "pending",
-      qrCode: "00020126TESTE-CORPUS-FIT-PIX",
+      qrCode: "00020126TESTE-OZORIO-FIT-PIX",
       qrCodeBase64: null,
       expiresAt: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
     };
