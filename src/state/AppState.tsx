@@ -34,18 +34,26 @@ const profileDefaults: ProfileSettings = {
   social: { instagram: true, facebook: true, tiktok: true, whatsapp: false },
 };
 
-function readStorage<T>(key: string, fallback: T): T {
+function readStorage<T>(key: string, fallback: T, legacyKey?: string): T {
   if (typeof window === "undefined") return fallback;
   try {
     const raw = window.localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : fallback;
+    if (raw) return JSON.parse(raw) as T;
+
+    const legacyRaw = legacyKey ? window.localStorage.getItem(legacyKey) : null;
+    if (!legacyRaw) return fallback;
+
+    const migrated = JSON.parse(legacyRaw) as T;
+    window.localStorage.setItem(key, legacyRaw);
+    window.localStorage.removeItem(legacyKey!);
+    return migrated;
   } catch {
     return fallback;
   }
 }
 
-function usePersistentState<T>(key: string, fallback: T) {
-  const [value, setValue] = useState<T>(() => readStorage(key, fallback));
+function usePersistentState<T>(key: string, fallback: T, legacyKey?: string) {
+  const [value, setValue] = useState<T>(() => readStorage(key, fallback, legacyKey));
 
   useEffect(() => {
     try {
@@ -59,10 +67,10 @@ function usePersistentState<T>(key: string, fallback: T) {
 }
 
 export function AppStateProvider({ children }: { children: ReactNode }) {
-  const [classes, setClasses] = usePersistentState<ClassSession[]>("corpus:v1:classes", initialClasses);
-  const [notifications, setNotifications] = usePersistentState<AppNotification[]>("corpus:v1:notifications", initialNotifications);
-  const [profile, setProfile] = usePersistentState<ProfileSettings>("corpus:v1:profile", profileDefaults);
-  const [theme, setTheme] = usePersistentState<ThemeMode>("corpus:v1:theme", "light");
+  const [classes, setClasses] = usePersistentState<ClassSession[]>("ozorio-fit:v1:classes", initialClasses, "corpus:v1:classes");
+  const [notifications, setNotifications] = usePersistentState<AppNotification[]>("ozorio-fit:v1:notifications", initialNotifications, "corpus:v1:notifications");
+  const [profile, setProfile] = usePersistentState<ProfileSettings>("ozorio-fit:v1:profile", profileDefaults, "corpus:v1:profile");
+  const [theme, setTheme] = usePersistentState<ThemeMode>("ozorio-fit:v1:theme", "light", "corpus:v1:theme");
   const [selectedPublicProfile, setSelectedPublicProfile] = useState<PublicProfile | null>(null);
 
   useEffect(() => {
