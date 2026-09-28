@@ -19,7 +19,7 @@ if ("serviceWorker" in navigator) {
       .catch(() => undefined);
 
     navigator.serviceWorker.addEventListener("controllerchange", () => {
-      const key = "corpus-fit-sw-reloaded";
+      const key = "ozorio-fit-sw-reloaded";
       if (sessionStorage.getItem(key)) return;
       sessionStorage.setItem(key, "1");
       window.location.reload();
