@@ -41,3 +41,10 @@
 .assessment-actions > :only-child { grid-column:1/-1; }
 .assessment-loading { color:var(--muted); text-align:center; }
 @media(max-width:360px){ .assessment-grid{grid-template-columns:1fr}.assessment-grid > :first-child:nth-last-child(3){grid-column:auto}.assessment-actions{grid-template-columns:1fr} }
+
+.assessment-home-card { display:grid; grid-template-columns:46px 1fr; gap:10px; align-items:start; margin-bottom:12px; border-left:3px solid var(--green); }
+.assessment-home-card h3 { margin:3px 0 5px; font-size:1.05rem; }
+.assessment-home-card p { margin:0; color:var(--muted); font-size:.8rem; line-height:1.4; }
+.assessment-home-card > button { grid-column:1/-1; }
+.assessment-home-card--done { border-left-color:#a8b4bd; }
+.assessment-home-card--done .round-icon { background:#eef4f1; }
