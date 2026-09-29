@@ -11,6 +11,7 @@ import "./turnstile.css";
 import "./trainer.css";
 import "./student-workouts.css";
 import "./health.css";
+import "./assessment.css";
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {

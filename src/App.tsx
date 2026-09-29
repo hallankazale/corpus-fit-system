@@ -4,6 +4,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { TrainerRoute } from "./components/TrainerRoute";
 import { AboutScreen } from "./screens/AboutScreen";
 import { ActiveWorkoutScreen } from "./screens/ActiveWorkoutScreen";
+import { AssessmentScreen } from "./screens/AssessmentScreen";
 import { AdminScreen } from "./screens/AdminScreen";
 import { ClassesScreen } from "./screens/ClassesScreen";
 import { EvolutionScreen } from "./screens/EvolutionScreen";
@@ -28,6 +29,7 @@ export function App() {
       <Route path="/login" element={<LoginScreen />} />
       <Route path="/cadastro" element={<RegisterScreen />} />
       <Route path="/" element={<Private><HomeScreen /></Private>} />
+      <Route path="/avaliacao" element={<Private><AssessmentScreen /></Private>} />
       <Route path="/treinos" element={<Private><WorkoutsScreen /></Private>} />
       <Route path="/treinos/ativo" element={<Private><ActiveWorkoutScreen /></Private>} />
       <Route path="/saude" element={<Private><HealthScreen /></Private>} />

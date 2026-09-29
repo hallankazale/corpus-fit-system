@@ -44,7 +44,7 @@ export function RegisterScreen() {
       return;
     }
 
-    navigate("/", { replace: true });
+    navigate("/avaliacao", { replace: true });
   };
 
   return (
