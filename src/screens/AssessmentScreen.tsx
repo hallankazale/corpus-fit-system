@@ -1,4 +1,4 @@
-import { Activity, AlertTriangle, Apple, CheckCircle2, ChevronLeft, ChevronRight, Dumbbell, ShieldCheck, Target } from "lucide-react";
+import { AlertTriangle, Apple, CheckCircle2, ChevronLeft, ChevronRight, Dumbbell, ShieldCheck, Target } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { AppShell } from "../components/AppShell";
 import {
