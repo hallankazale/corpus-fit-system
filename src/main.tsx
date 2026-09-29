@@ -20,7 +20,7 @@ if ("serviceWorker" in navigator) {
       .catch(() => undefined);
 
     navigator.serviceWorker.addEventListener("controllerchange", () => {
-      const key = "ozorio-fit-sw-reloaded";
+      const key = "ozorio-fit-sw-reloaded-v2";
       if (sessionStorage.getItem(key)) return;
       sessionStorage.setItem(key, "1");
       window.location.reload();
