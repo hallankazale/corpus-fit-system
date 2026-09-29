@@ -16,9 +16,9 @@ import {
 } from "../services/assessmentService";
 
 const initial: FitnessAssessmentInput = {
-  age: 35,
-  weight_kg: 80,
-  height_cm: 175,
+  age: 0,
+  weight_kg: 0,
+  height_cm: 0,
   goal: "recomposition",
   experience: "beginner",
   training_days: 3,
