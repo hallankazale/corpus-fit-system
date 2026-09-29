@@ -1,4 +1,5 @@
-import { CalendarDays, CheckCircle2, CreditCard, Dumbbell, LockKeyhole, ShieldCheck, Target, UserRound, Weight } from "lucide-react";
+import { CalendarDays, CheckCircle2, CreditCard, Dumbbell, LockKeyhole, ShieldCheck, Sparkles, Target, UserRound, Weight } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppShell } from "../components/AppShell";
 import { BrandLogo } from "../components/BrandLogo";
@@ -6,6 +7,7 @@ import { LineChart } from "../components/LineChart";
 import { SectionCard } from "../components/SectionCard";
 import { StatusChip } from "../components/StatusChip";
 import { canAccessAdmin } from "../services/accountService";
+import { fetchOwnAssessment } from "../services/assessmentService";
 import { useAccount } from "../state/AccountContext";
 
 export function HomeScreen() {
@@ -13,13 +15,24 @@ export function HomeScreen() {
   const { account, loading } = useAccount();
   const firstName = account?.profile.full_name.trim().split(/\s+/)[0] || "Aluno";
   const membership = account?.membership;
+  const [assessmentReady, setAssessmentReady] = useState<boolean | null>(null);
   const planActive = membership?.status === "active";
   const accessEnabled = Boolean(membership?.access_enabled);
+
+  useEffect(() => {
+    let mounted = true;
+    void fetchOwnAssessment()
+      .then((value) => mounted && setAssessmentReady(Boolean(value)))
+      .catch(() => mounted && setAssessmentReady(false));
+    return () => { mounted = false; };
+  }, []);
 
   return (
     <AppShell>
       <div className="page-pad dashboard">
-        <div className="welcome"><h1>Olá, <span>{loading ? "..." : firstName}</span></h1><p>Seu painel da academia</p></div>
+        <div className="welcome"><h1>Olá, <span>{loading ? "..." : firstName}</span></h1><p>Seu plano de treino, alimentação e evolução</p></div>
+        {assessmentReady === false && <section className="section-card assessment-home-card"><div className="round-icon green"><Sparkles /></div><div><b>Comece por aqui</b><h3>Faça sua avaliação inicial</h3><p>Em poucos minutos o Ozorio Fit entende seu objetivo, rotina, limitações e alimentação para personalizar seu plano.</p></div><button className="primary-button" onClick={() => navigate("/avaliacao")}>Fazer avaliação</button></section>}
+        {assessmentReady === true && <section className="section-card assessment-home-card assessment-home-card--done"><div className="round-icon green"><CheckCircle2 /></div><div><b>Perfil personalizado</b><h3>Sua avaliação está salva</h3><p>Você pode atualizar suas respostas sempre que sua rotina, objetivo ou limitações mudarem.</p></div><button className="outline-button" onClick={() => navigate("/avaliacao")}>Revisar avaliação</button></section>}
         <section className="hero-card hero-card--membership">
           <BrandLogo compact />
           <div className="hero-card__divider" />
