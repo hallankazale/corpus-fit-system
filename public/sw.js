@@ -1,4 +1,4 @@
-const CACHE = "ozorio-fit-v1";
+const CACHE = "ozorio-fit-v2";
 const APP_SHELL = "./";
 
 self.addEventListener("install", (event) => {
